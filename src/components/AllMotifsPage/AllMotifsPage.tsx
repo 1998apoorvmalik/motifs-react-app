@@ -23,8 +23,8 @@ const AllMotifsPage: React.FC = () => {
   const initialItemsPerPage = restoredMotifPageState.itemsPerPage || 30;
   const initialSearchQuery = restoredMotifPageState.searchQuery || "";
   const initialSelectedFilters = restoredMotifPageState.selectedFilters || [];
-  const initialSelectedSort = restoredMotifPageState.selectedSort || "ID";
-  const initialSortOrder = restoredMotifPageState.sortOrder || "asc";
+  const initialSelectedSort = restoredMotifPageState.selectedSort || "Number of Families";
+  const initialSortOrder = restoredMotifPageState.sortOrder || "desc";
 
   const [isFilterOpen, setFilterOpen] = useState(false);
   const [isSortOpen, setSortOpen] = useState(false);

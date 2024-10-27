@@ -7,7 +7,7 @@ export default interface Motif {
   families: { [familyName: string]: number }; // Dictionary of family counts
   bpairs: number[][];
   ipairs: number[][];
-  loops: number[];
+  loops: number;
   svg: string; // Single SVG path based on index
   y_sub: string;
   y_star: string;

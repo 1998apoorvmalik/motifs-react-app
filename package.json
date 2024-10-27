@@ -2,6 +2,7 @@
   "name": "motifs",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://10.217.112.20:5000/",
   "dependencies": {
     "@fortawesome/fontawesome-free": "*",
     "@testing-library/jest-dom": "*",
@@ -60,6 +61,7 @@
     "@types/react-router-dom": "*",
     "@types/react-svg-pan-zoom": "^3.3.9",
     "@types/react-svg-pan-zoom-loader": "^1.5.0",
+    "serve": "^14.2.4",
     "typescript": "^4.9.5"
   }
 }

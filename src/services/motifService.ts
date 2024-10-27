@@ -2,7 +2,7 @@ import axios from "axios";
 import Motif from "../interfaces/Motif";
 import Structure from "../interfaces/Structure";
 
-const API_URL = "http://127.0.0.1:5000/"; // Replace with your backend URL
+const API_URL = ""; // Replace with your backend URL
 
 // Service to fetch paginated motif data
 export const motifService = {
@@ -61,15 +61,6 @@ export const motifService = {
         },
       });
 
-      // console.log({
-      //   page,
-      //   limit,
-      //   families: families.join(","), // Convert array to comma-separated string
-      //   motifID,
-      //   sortField,
-      //   sortOrder,
-      // });
-
       const motifs: Motif[] = response.data.motifs.map((motif: any) => ({
         id: motif._id,
         numOccurences: motif.occurrences.length,
@@ -77,7 +68,7 @@ export const motifService = {
         families: motif.family2count,
         bpairs: motif.bpairs,
         ipairs: motif.ipairs,
-        loops: motif.motif.root.loops,
+        loops: motif.cardinality,
         svg: motif.motif_svg,
         y_sub: motif.y_sub,
         y_star: motif.y_star,

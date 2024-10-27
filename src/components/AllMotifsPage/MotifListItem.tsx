@@ -21,7 +21,7 @@ const MotifListItem: React.FC<MotifListItemProps> = ({ item, onViewClick }) => {
       <span className="length-column">{item.length}</span>
       <span className="bpairs-column">{item.bpairs.length}</span>
       <span className="ipairs-column">{item.ipairs.length}</span>
-      <span className="loops-column">{item.loops.length}</span>
+      <span className="loops-column">{item.loops}</span>
       <button className="expand-button" onClick={onViewClick}>
         View Motif
       </button>

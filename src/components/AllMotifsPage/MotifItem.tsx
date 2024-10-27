@@ -45,11 +45,11 @@ const MotifItem: React.FC<MotifItemProps> = ({ item, onViewClick }) => {
         Length: {item.length} <br />
         Boundary Pairs: {item.bpairs.length} <br />
         Internal Pairs: {item.ipairs.length} <br />
-        Number of Loops: {item.loops.length}
+        Number of Loops: {item.loops}
       </p>
 
-      <CopyableTextBlock text={item.y_sub} label="y_sub" />
-      <CopyableTextBlock text={item.y_star} label="y_star" />
+      {/* <CopyableTextBlock text={item.y_sub} label="y_sub" />
+      <CopyableTextBlock text={item.y_star} label="y_star" /> */}
     </div>
   );
 };
