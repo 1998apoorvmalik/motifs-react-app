@@ -11,7 +11,8 @@ import SortDropdown from "./SortDropdown";
 import Pagination from "../Pagination";
 import ItemsPerPage from "../ItemsPerPage";
 import MotifListItem from "./MotifListItem";
-import MotifItem from "./MotifItem";
+import MotifItem from "../MotifItem";
+import NewStructureInput from "./../NewStructureInput";
 
 const AllMotifsPage: React.FC = () => {
   const location = useLocation();
@@ -23,8 +24,12 @@ const AllMotifsPage: React.FC = () => {
   const initialItemsPerPage = restoredMotifPageState.itemsPerPage || 30;
   const initialSearchQuery = restoredMotifPageState.searchQuery || "";
   const initialSelectedFilters = restoredMotifPageState.selectedFilters || [];
-  const initialSelectedSort = restoredMotifPageState.selectedSort || "Number of Families";
+  const initialSelectedSort =
+    restoredMotifPageState.selectedSort || "Number of Families";
   const initialSortOrder = restoredMotifPageState.sortOrder || "desc";
+
+  // Dialog box state
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
 
   const [isFilterOpen, setFilterOpen] = useState(false);
   const [isSortOpen, setSortOpen] = useState(false);
@@ -102,6 +107,27 @@ const AllMotifsPage: React.FC = () => {
     });
   };
 
+  const handleNewButtonClick = () => {
+    setIsDialogVisible(true);
+  };
+
+  const handleDialogSubmit = async (newStructure: string) => {
+    try {
+      setLoading(true);
+      const motifs: Motif[] = await motifService.newStructure(newStructure);
+
+      navigate("/new", { state: { motifs } });
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "Unknown error occurred"
+      );
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogVisible(false);
+  };
+
   // Render loading, error, or the grid of motifs
   if (loading) {
     return <div>Loading...</div>;
@@ -116,9 +142,18 @@ const AllMotifsPage: React.FC = () => {
       <h1 style={{ textAlign: "center" }}>Motifs App</h1>
       <div className="container">
         <div className="header-bar">
-          <button className="header-button" onClick={() => alert("New Item")}>
-            New
-          </button>
+          <div>
+            <button className="header-button" onClick={handleNewButtonClick}>
+              New
+            </button>
+
+            <NewStructureInput
+              placeholder="Enter dot-bracket structure"
+              onInputSubmit={handleDialogSubmit}
+              isVisible={isDialogVisible}
+              onClose={handleCloseDialog}
+            />
+          </div>
 
           {/* View toggle buttons */}
           <div className="view-toggle">

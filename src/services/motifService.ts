@@ -2,7 +2,7 @@ import axios from "axios";
 import Motif from "../interfaces/Motif";
 import Structure from "../interfaces/Structure";
 
-const API_URL = ""; // Replace with your backend URL
+const API_URL = "http://127.0.0.1:5000/"; // Replace with your backend URL
 
 // Service to fetch paginated motif data
 export const motifService = {
@@ -105,4 +105,30 @@ export const motifService = {
     }
     return {} as Structure; // Return an empty structure in case of error
   },
+
+  async newStructure(structure: string): Promise<Motif[]> {
+    try {
+      const response = await axios.post(API_URL + "/new", { structure });
+  
+      // Convert the `motifs` field to an array of `Motif` objects
+      const motifs: Motif[] = response.data.motifs.map((motifData: any, index: number) => ({
+        id: motifData.id,
+        numOccurences: motifData.numOccurences || 0,
+        length: motifData.end - motifData.start + 1,
+        families: [],
+        bpairs: motifData.bpairs,
+        ipairs: motifData.ipairs,
+        loops: motifData.ipairs.length + 1,
+        svg: response.data.svgs[index]?.content || "", // Use the corresponding SVG content
+        y_sub: motifData.y_sub,
+        y_star: motifData.y_star,
+        structures_id: [],
+      }));
+
+      return motifs;
+    } catch (error: unknown) {
+      this._handleError(error);
+    }
+    return [] as Motif[]; // Return an empty array in case of error
+  }
 };

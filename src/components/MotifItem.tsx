@@ -1,19 +1,34 @@
 // src/components/MotifItem.tsx
 import React from "react";
-import Motif from "../../interfaces/Motif";
-import CopyableTextBlock from "./../CopyableTextBlock";
-import SvgViewer from "./../SvgViewer";
+import Motif from "../interfaces/Motif";
+import CopyableTextBlock from "./CopyableTextBlock";
+import SvgViewer from "./SvgViewer";
 
 interface MotifItemProps {
   item: Motif;
+  height?: string;
+  resizable?: boolean;
   onViewClick: () => void;
 }
 
-const MotifItem: React.FC<MotifItemProps> = ({ item, onViewClick }) => {
+const MotifItem: React.FC<MotifItemProps> = ({
+  item,
+  height,
+  resizable,
+  onViewClick,
+}) => {
   return (
     <div className="grid-item">
       <div className="motif-item-title">
-        <h2 style={{ margin: 0 }}>ID: {item.id}</h2>
+        <h2
+          style={{
+            margin: 0,
+            // color: item.id === "online" ? "Blue" : "inherit",
+          }}
+        >
+          {item.id === "online" ? "ID: New" : `ID: ${item.id}`}
+        </h2>
+
         <span className="info-icon">
           <i className="fas fa-info-circle" style={{ fontSize: 20 }}></i>
           <span className="tooltip-text">Additional info about this item</span>
@@ -22,20 +37,26 @@ const MotifItem: React.FC<MotifItemProps> = ({ item, onViewClick }) => {
       <br />
       <strong className="p-nomargin">Families:</strong>
       <p className="p-nomargin">
-        {Object.entries(item.families)
-          .map(([family, count]) => `${family} (${count})`)
-          .join(", ")}
+        {Object.entries(item.families).length > 0
+          ? Object.entries(item.families)
+              .map(([family, count]) => `${family} (${count})`)
+              .join(", ")
+          : "None"}
       </p>
       <br />
 
       <SvgViewer
         svgXML={item.svg}
         resetToolOnMouseLeave={true}
-        height="40vh"
-        resizable={false}
+        height={height || "40vh"}
+        resizable={resizable || false}
       ></SvgViewer>
 
-      <button className="expand-button" style={{marginTop: '8px'}} onClick={onViewClick}>
+      <button
+        className="expand-button"
+        style={{ marginTop: "8px" }}
+        onClick={onViewClick}
+      >
         View Motif
       </button>
 
