@@ -150,7 +150,7 @@ export const motifService = {
                   onProgress(parsedData.progress);
                 } else if (parsedData.motifs && parsedData.svgs) {
                   parsedData.motifs.forEach((motifData: any, index: number) => {
-                    console.log(motifData.id, motifData.id_uniq); // debugging line
+                    // console.log(motifData.id, motifData.id_uniq); // debugging line
                     motifs.push({
                       id: motifData.id_uniq > 361 ? motifData.id : motifData.id_uniq,
                       numOccurences: motifData.numOccurences || 0,
