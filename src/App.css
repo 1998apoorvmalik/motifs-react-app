@@ -49,6 +49,10 @@ a {
   }
 }
 
+.info {
+  color: #17a2b8;
+}
+
 .invalid-input {
   border: 1px solid red;
 }
