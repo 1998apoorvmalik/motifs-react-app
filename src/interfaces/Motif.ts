@@ -9,7 +9,6 @@ export default interface Motif {
   ipairs: number[][];
   loops: number;
   svg: string; // Single SVG path based on index
-  y_sub: string;
-  y_star: string;
+  dotBracket: string; // Dot-bracket notation of the motif
   structures_id: string[];
 }

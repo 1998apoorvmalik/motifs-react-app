@@ -7,6 +7,12 @@ interface NewStructureInputProps {
   onClose: () => void;
 }
 
+const predefinedStructures = {
+  "Sample 1": "(.(.(...)...))",
+  "Sample 2": "(.(...(...)..)..)",
+  // "Sample 3": ".((......((......))......((......((......))......((......))......))......)).....",
+};
+
 const NewStructureInput: React.FC<NewStructureInputProps> = ({
   placeholder = "Type here...",
   onInputSubmit,
@@ -14,20 +20,32 @@ const NewStructureInput: React.FC<NewStructureInputProps> = ({
   onClose,
 }) => {
   const [inputValue, setInputValue] = useState("");
+  const [isValid, setIsValid] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // Determine the selected structure based on inputValue
+  const selectedStructureKey = Object.keys(predefinedStructures).find(
+    key => predefinedStructures[key as keyof typeof predefinedStructures] === inputValue
+  ) || "";
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = event.target.value;
-    // Allow only '(', ')', and '.'
-    const filteredValue = value.replace(/[^().]/g, '');
-    setInputValue(filteredValue);
+    const value = event.target.value.replace(/[^().{}[\]<>]/g, '').replace(/[{}[\]<>]/g, '.');
+    setInputValue(value);
+    setIsValid(true);
+    setErrorMessage("");
   };
 
   const handleInputSubmit = () => {
-    if (onInputSubmit) {
-      onInputSubmit(inputValue);
+    if (isValidRNAStructure(inputValue)) {
+      setIsValid(true);
+      setErrorMessage("");
+      if (onInputSubmit) onInputSubmit(inputValue);
+      setInputValue("");
+      onClose();
+    } else {
+      setIsValid(false);
+      setErrorMessage("Invalid RNA structure: Ensure each '(' has a matching ')'");
     }
-    setInputValue(""); // Clear input after submit
-    onClose(); // Close dialog after submit
   };
 
   const handleOutsideClick = (event: MouseEvent) => {
@@ -36,18 +54,39 @@ const NewStructureInput: React.FC<NewStructureInputProps> = ({
     }
   };
 
+  const handleStructureSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const structure = event.target.value as keyof typeof predefinedStructures;
+    if (predefinedStructures[structure]) {
+      setInputValue(predefinedStructures[structure]);
+      setIsValid(true);
+      setErrorMessage("");
+    }
+  };
+
+  const isValidRNAStructure = (structure: string): boolean => {
+    let balance = 0;
+    for (const char of structure) {
+      if (char === '(') balance++;
+      else if (char === ')') balance--;
+      if (balance < 0) return false;
+    }
+    return balance === 0;
+  };
+
   useEffect(() => {
     if (isVisible) {
       document.addEventListener('click', handleOutsideClick);
-      document.body.style.overflow = 'hidden'; // Disable background scrolling
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = ''; // Enable background scrolling
+      document.body.style.overflow = '';
       document.removeEventListener('click', handleOutsideClick);
-      setInputValue(""); // Clear input when dialog closes
+      setInputValue("");
+      setIsValid(true);
+      setErrorMessage("");
     }
 
     return () => {
-      document.body.style.overflow = ''; // Ensure scrolling is re-enabled on cleanup
+      document.body.style.overflow = '';
       document.removeEventListener('click', handleOutsideClick);
     };
   }, [isVisible]);
@@ -61,12 +100,27 @@ const NewStructureInput: React.FC<NewStructureInputProps> = ({
           <i className="fas fa-times"></i>
         </button>
         <h2>Find Motifs in a New Structure</h2>
+        <select
+          onChange={handleStructureSelect}
+          className="structure-select"
+          value={selectedStructureKey} // Set the selected option based on inputValue
+        >
+          <option value="" disabled hidden>
+            Select a sample structure
+          </option>
+          {Object.keys(predefinedStructures).map((structure) => (
+            <option key={structure} value={structure}>
+              {structure}
+            </option>
+          ))}
+        </select>
         <textarea
           placeholder={placeholder}
           value={inputValue}
           onChange={handleInputChange}
-          className="dialog-input"
+          className={`dialog-input ${isValid ? '' : 'invalid-input'}`}
         />
+        {!isValid && <p className="error-message">{errorMessage}</p>}
         <button onClick={handleInputSubmit} className="submit-button">
           Submit
         </button>

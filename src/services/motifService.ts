@@ -2,7 +2,6 @@ import axios from "axios";
 import Motif from "../interfaces/Motif";
 import Structure from "../interfaces/Structure";
 
-
 const API_URL = process.env.REACT_APP_API_URL || "/127.0.0.1:5000";
 
 // Service to fetch paginated motif data
@@ -71,8 +70,7 @@ export const motifService = {
         ipairs: motif.ipairs,
         loops: motif.cardinality,
         svg: motif.motif_svg,
-        y_sub: motif.y_sub,
-        y_star: motif.y_star,
+        dotBracket: motif['dot-bracket'][0],
         structures_id: motif.occurrences,
       }));
 
@@ -107,29 +105,78 @@ export const motifService = {
     return {} as Structure; // Return an empty structure in case of error
   },
 
-  async newStructure(structure: string): Promise<Motif[]> {
-    try {
-      const response = await axios.post(API_URL + "/new", { structure });
-  
-      // Convert the `motifs` field to an array of `Motif` objects
-      const motifs: Motif[] = response.data.motifs.map((motifData: any, index: number) => ({
-        id: motifData.id,
-        numOccurences: motifData.numOccurences || 0,
-        length: motifData.end - motifData.start + 1,
-        families: [],
-        bpairs: motifData.bpairs,
-        ipairs: motifData.ipairs,
-        loops: motifData.ipairs.length + 1,
-        svg: response.data.svgs[index]?.content || "", // Use the corresponding SVG content
-        y_sub: motifData.y_sub,
-        y_star: motifData.y_star,
-        structures_id: [],
-      }));
+  async newStructure(
+    structure: string,
+    onProgress: (progress: string) => void,
+    signal: AbortSignal // Add the AbortSignal parameter
+  ): Promise<Motif[]> {
+    const motifs: Motif[] = [];
+    let partialData = "";
 
-      return motifs;
-    } catch (error: unknown) {
-      this._handleError(error);
+    const response = await fetch(`${API_URL}/new`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ structure }),
+      signal, // Pass the signal to the fetch request
+    });
+
+    if (!response.body) {
+      throw new Error("Streaming not supported by this browser.");
     }
-    return [] as Motif[]; // Return an empty array in case of error
-  }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+
+    return new Promise<Motif[]>((resolve, reject) => {
+      const processChunk = async () => {
+        let done: boolean;
+        let value: Uint8Array | undefined;
+
+        while ((({ done, value } = await reader.read()), !done)) {
+          const chunk = decoder.decode(value, { stream: true });
+          partialData += chunk;
+
+          const lines = partialData.split("\n\n");
+          partialData = lines.pop() || "";
+
+          lines.forEach((line) => {
+            if (line.startsWith("data: ")) {
+              try {
+                const parsedData = JSON.parse(line.slice(6));
+
+                if (parsedData.error) {
+                  reject(new Error(parsedData.error));
+                } else if (parsedData.progress) {
+                  onProgress(parsedData.progress);
+                } else if (parsedData.motifs && parsedData.svgs) {
+                  parsedData.motifs.forEach((motifData: any, index: number) => {
+                    motifs.push({
+                      id: motifData.id,
+                      numOccurences: motifData.numOccurences || 0,
+                      length: motifData.end - motifData.start + 1,
+                      families: {},
+                      bpairs: motifData.bpairs,
+                      ipairs: motifData.ipairs,
+                      loops: motifData.ipairs.length + 1,
+                      svg: parsedData.svgs[index]?.content || "",
+                      dotBracket: motifData['dot-bracket'],
+                      structures_id: [],
+                    });
+                  });
+                }
+              } catch (e) {
+                console.error("Error parsing JSON:", e);
+              }
+            }
+          });
+        }
+
+        resolve(motifs);
+      };
+
+      processChunk().catch((error) => {
+        reject(error);
+      });
+    });
+  },
 };

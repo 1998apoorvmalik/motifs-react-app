@@ -1,5 +1,5 @@
 // src/components/AllMotifsPage.tsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import Motif from "../../interfaces/Motif";
@@ -13,6 +13,8 @@ import ItemsPerPage from "../ItemsPerPage";
 import MotifListItem from "./MotifListItem";
 import MotifItem from "../MotifItem";
 import NewStructureInput from "./../NewStructureInput";
+import LoadingSpinner from "../LoadingSpinnner";
+import FindNewMotifsProgress from "./FindNewMotifsProgress";
 
 const AllMotifsPage: React.FC = () => {
   const location = useLocation();
@@ -28,9 +30,6 @@ const AllMotifsPage: React.FC = () => {
     restoredMotifPageState.selectedSort || "Number of Families";
   const initialSortOrder = restoredMotifPageState.sortOrder || "desc";
 
-  // Dialog box state
-  const [isDialogVisible, setIsDialogVisible] = useState(false);
-
   const [isFilterOpen, setFilterOpen] = useState(false);
   const [isSortOpen, setSortOpen] = useState(false);
 
@@ -45,19 +44,30 @@ const AllMotifsPage: React.FC = () => {
 
   const [viewMode, setViewMode] = useState<"grid" | "list">(initialViewMode);
   const [searchQuery, setSearchQuery] = useState<string>(initialSearchQuery);
-  const [itemsPerPage, setItemsPerPage] = useState<number>(initialItemsPerPage);
 
   // Pagination states
+  const [itemsPerPage, setItemsPerPage] = useState<number>(initialItemsPerPage);
   const [currentPage, setCurrentPage] = useState(initialCurrentPage);
   const [motifs, setMotifs] = useState<Motif[]>([]); // State to store the fetched motifs
   const [totalPages, setTotalPages] = useState(1); // State for total number of pages
-  const [loading, setLoading] = useState(false); // Loading state
-  const [error, setError] = useState<string | null>(null); // Error state
+
+  // New Structure Process States
+  const [response, setResponse] = useState<{ motifs: Motif[] } | null>(null);
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
+  const [inputStructure, setInputStructure] = useState("");
+
+  // Separate loading states
+  const [loadingMotifs, setLoadingMotifs] = useState(false);
+  const [loadingNewMotifs, setLoadingNewMotifs] = useState(false);
+  const [progressUpdates, setProgressUpdates] = useState<string[]>([]); // Store all progress updates
+  const abortControllerRef = useRef<AbortController | null>(null); // Ref to store AbortController
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch paginated motifs when component mounts or page/itemsPerPage changes
   useEffect(() => {
     const fetchMotifs = async () => {
-      setLoading(true);
+      console.log("Fetching motifs...");
+      setLoadingMotifs(true);
       setError(null); // Clear previous errors
       try {
         const data = await motifService.getFilteredPaginatedMotifs(
@@ -75,7 +85,7 @@ const AllMotifsPage: React.FC = () => {
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error occurred");
       } finally {
-        setLoading(false); // Stop loading after the request completes
+        setLoadingMotifs(false); // Stop loading after the request completes
       }
     };
 
@@ -111,16 +121,41 @@ const AllMotifsPage: React.FC = () => {
     setIsDialogVisible(true);
   };
 
-  const handleDialogSubmit = async (newStructure: string) => {
-    try {
-      setLoading(true);
-      const motifs: Motif[] = await motifService.newStructure(newStructure);
+  const handleNewMotifsRedirection = () => {
+    if (response && response.motifs && response.motifs.length > 0) {
+      navigate("/new", { state: { motifs: response?.motifs } });
+    } else {
+      handleCancelNewMotifs();
+    }
+  };
 
-      navigate("/new", { state: { motifs } });
-    } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "Unknown error occurred"
+  const handleDialogSubmit = async (newStructure: string) => {
+    setError(null);
+    setProgressUpdates([]);
+    setIsDialogVisible(false); // Close the dialog
+    setLoadingNewMotifs(true);
+
+    // Initialize AbortController
+    abortControllerRef.current = new AbortController();
+
+    try {
+      setInputStructure(newStructure);
+      const motifs: Motif[] = await motifService.newStructure(
+        newStructure,
+        (progressUpdate: string) => {
+          setProgressUpdates((prevUpdates) => [...prevUpdates, progressUpdate]);
+        },
+        abortControllerRef.current.signal // Pass the signal to the service
       );
+      setResponse({ motifs });
+    } catch (error) {
+      if ((error as Error).name === "AbortError") {
+        console.log("Request was canceled");
+      } else {
+        setError(
+          error instanceof Error ? error.message : "Unknown error occurred"
+        );
+      }
     }
   };
 
@@ -128,9 +163,31 @@ const AllMotifsPage: React.FC = () => {
     setIsDialogVisible(false);
   };
 
+  const handleCancelNewMotifs = () => {
+    // Abort the ongoing request
+    setLoadingNewMotifs(false);
+    setProgressUpdates([]);
+    setResponse(null);
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+  };
+
   // Render loading, error, or the grid of motifs
-  if (loading) {
-    return <div>Loading...</div>;
+  if (loadingMotifs) {
+    return <LoadingSpinner message="Loading Motifs..." />;
+  }
+
+  if (loadingNewMotifs) {
+    return (
+      <FindNewMotifsProgress
+        inputStructure={inputStructure}
+        progressUpdates={progressUpdates}
+        response={response}
+        onRedirectNowClick={handleNewMotifsRedirection}
+        onCancel={handleCancelNewMotifs}
+      />
+    );
   }
 
   if (error) {
@@ -140,11 +197,20 @@ const AllMotifsPage: React.FC = () => {
   return (
     <div>
       <h1 style={{ textAlign: "center" }}>Motifs App</h1>
+      {/* <div style={{ display: "flex", justifyContent: "end", alignItems: "center" }}> */}
+      <a href="https://github.com/shanry/RNA-Undesign/">
+        <i className="fab fa-github" style={{ marginRight: "8px" }}></i>
+        https://github.com/shanry/RNA-Undesign/
+      </a>
+      {/* </div> */}
       <div className="container">
         <div className="header-bar">
           <div>
-            <button className="header-button" onClick={handleNewButtonClick}>
-              New
+            <button
+              className="new-structure-button"
+              onClick={handleNewButtonClick}
+            >
+              Input Structure
             </button>
 
             <NewStructureInput
@@ -179,7 +245,7 @@ const AllMotifsPage: React.FC = () => {
             }}
           />
 
-          <div className="right-section">
+          <div className="header-section">
             <FamilyFilterDropdown
               isOpen={isFilterOpen}
               toggleDropdown={toggleFilterDropdown}

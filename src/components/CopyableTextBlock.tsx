@@ -19,9 +19,9 @@ const CopyableTextBlock: React.FC<CopyableTextBlockProps> = ({ text, label }) =>
 
   return (
     <div className="copyable-text-block">
-      <p style={{marginTop: 0, marginBottom: 4}}>{label}:</p>
-      <pre>{text}</pre>
-    
+      <p>{label}:</p>
+      <pre>{text} </pre>
+
       {/* Font Awesome icon */}
       <span className="copy-icon" onClick={handleCopy}>
         <i className={`fas ${copied ? "fa-check" : "fa-copy"}`}></i>

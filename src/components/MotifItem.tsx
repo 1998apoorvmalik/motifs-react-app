@@ -70,8 +70,7 @@ const MotifItem: React.FC<MotifItemProps> = ({
         Number of Loops: {item.loops}
       </p>
 
-      {/* <CopyableTextBlock text={item.y_sub} label="y_sub" />
-      <CopyableTextBlock text={item.y_star} label="y_star" /> */}
+      <CopyableTextBlock text={item.dotBracket} label="Dot-Bracket Structure" />
     </div>
   );
 };

@@ -1,0 +1,23 @@
+/* src/components/LoadingSpinner.css */
+.loading-spinner {
+    position: fixed; /* Fixed position to center in viewport */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the spinner */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-size: 16px;
+    color: #333;
+    z-index: 9999; /* Ensure it's on top of other content */
+    background-color: rgba(255, 255, 255, 0.8); /* Optional: semi-transparent background */
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  .loading-spinner i {
+    margin-bottom: 8px;
+    color: #333; /* Adjust color as needed */
+  }
+  

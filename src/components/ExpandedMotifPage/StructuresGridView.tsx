@@ -66,23 +66,19 @@ const StructuresGridView: React.FC<GridProps> = ({
   return (
     <div className="container">
       <div className="header-bar">
-        <div className="header-section">
-
-          <div className='center' style={{ marginRight: "16px" }}>
+        <div style={{ marginLeft: "16px" }}>
           <ItemsPerPage
             itemsPerPage={itemsPerPage}
             onItemsPerPageChange={setItemsPerPage}
           />
-          </div>
-          
-
-          {/* Pagination Component */}
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
         </div>
+
+        {/* Pagination Component */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </div>
 
       {/* Display structures in a grid */}

@@ -8,6 +8,7 @@ import {
 } from "../../interfaces/MotifPageState";
 import StructuresGridView from "./StructuresGridView";
 import SvgViewer from "../SvgViewer";
+import CopyableTextBlock from "../CopyableTextBlock";
 
 const ExpandedMotifView: React.FC = () => {
   const location = useLocation();
@@ -78,6 +79,17 @@ const ExpandedMotifView: React.FC = () => {
         width="60%"
         height="60vh"
       ></SvgViewer>
+
+      <p>
+        Number of Occurrences: {item.numOccurences} <br />
+        Number of Families: {Object.keys(item.families).length} <br />
+        Length: {item.length} <br />
+        Boundary Pairs: {item.bpairs.length} <br />
+        Internal Pairs: {item.ipairs.length} <br />
+        Number of Loops: {item.loops}
+      </p>
+
+      <CopyableTextBlock text={item.dotBracket} label="Dot-Bracket Structure" />
 
       <h2
         style={{ textAlign: "center", marginTop: "48px", marginBottom: "8px" }}
