@@ -18,6 +18,12 @@ const NewMotifsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(5);
   const [totalPages, setTotalPages] = useState(1);
+  const [newMotifCount, setNewMotifCount] = useState(0);
+
+  useEffect(() => {
+    const newMotifs = motifs.filter((motif) => motif.id === "New");
+    setNewMotifCount(newMotifs.length);
+  }, [motifs]);
 
   useEffect(() => {
     // Calculate total pages based on motifs length and items per page
@@ -46,7 +52,9 @@ const NewMotifsPage: React.FC = () => {
       </button>
       <h2 style={{ textAlign: "center" }}>
         {motifs.length > 0
-          ? `Found ${motifs.length} Undesignable Motifs in the Input Structure`
+          ? `Found ${motifs.length} (${newMotifCount} New) Undesignable ${
+              motifs.length == 1 ? "Motif" : "Motifs"
+            } in the Input Structure`
           : "No Undesignable Motifs Found in the Input Structure!"}
       </h2>
       <div className="container">

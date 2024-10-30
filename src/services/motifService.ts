@@ -152,7 +152,7 @@ export const motifService = {
                   parsedData.motifs.forEach((motifData: any, index: number) => {
                     // console.log(motifData.id, motifData.id_uniq); // debugging line
                     motifs.push({
-                      id: motifData.id_uniq > 361 ? motifData.id : motifData.id_uniq,
+                      id: motifData.id_uniq > 361 ? 'New' : motifData.id_uniq,
                       numOccurences: motifData.numOccurences || 0,
                       length: motifData.end - motifData.start + 1,
                       families: {},
