@@ -9,6 +9,7 @@ interface FamilyFilterDropdownProps {
 }
 
 const filterOptions = [
+  "eterna",
   "5s",
   "srp",
   "RNaseP",

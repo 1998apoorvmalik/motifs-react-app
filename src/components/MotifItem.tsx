@@ -48,8 +48,9 @@ const MotifItem: React.FC<MotifItemProps> = ({
       <SvgViewer
         svgXML={item.svg}
         resetToolOnMouseLeave={true}
-        height={height || "40vh"}
+        height={height || "300px"}
         resizable={resizable || false}
+        showDownloadButton={true}
       ></SvgViewer>
 
       <button

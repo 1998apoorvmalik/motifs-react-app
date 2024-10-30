@@ -2,7 +2,8 @@ import axios from "axios";
 import Motif from "../interfaces/Motif";
 import Structure from "../interfaces/Structure";
 
-const API_URL = "http://127.0.0.1:5000/"; // Replace with your backend URL
+
+const API_URL = process.env.REACT_APP_API_URL || "/127.0.0.1:5000";
 
 // Service to fetch paginated motif data
 export const motifService = {
