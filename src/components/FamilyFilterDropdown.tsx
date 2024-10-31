@@ -1,5 +1,6 @@
-// src/components/FamilyFilterDropdown.tsx
 import React, { useEffect, useRef, useState } from "react";
+import { familyMapping } from "../constants/familyMapping";
+
 
 interface FamilyFilterDropdownProps {
   isOpen: boolean;
@@ -8,17 +9,7 @@ interface FamilyFilterDropdownProps {
   setSelectedFilters: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const filterOptions = [
-  "eterna",
-  "5s",
-  "srp",
-  "RNaseP",
-  "tmRNA",
-  "grp1",
-  "16s",
-  "23s",
-  "Other",
-];
+const filterOptions = familyMapping;
 
 const FamilyFilterDropdown: React.FC<FamilyFilterDropdownProps> = ({
   isOpen,
@@ -31,12 +22,12 @@ const FamilyFilterDropdown: React.FC<FamilyFilterDropdownProps> = ({
   // Temporary filters state for when the dropdown is open
   const [tempFilters, setTempFilters] = useState<string[]>(selectedFilters);
 
-  const handleFilterChange = (filter: string) => {
+  const handleFilterChange = (filterValue: string) => {
     setTempFilters((prevFilters) => {
-      if (prevFilters.includes(filter)) {
-        return prevFilters.filter((f) => f !== filter);
+      if (prevFilters.includes(filterValue)) {
+        return prevFilters.filter((f) => f !== filterValue);
       } else {
-        return [...prevFilters, filter];
+        return [...prevFilters, filterValue];
       }
     });
   };
@@ -48,8 +39,8 @@ const FamilyFilterDropdown: React.FC<FamilyFilterDropdownProps> = ({
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
-        toggleDropdown(); // Close the dropdown
-        setTempFilters(selectedFilters); // Reset temp filters
+        toggleDropdown();
+        setTempFilters(selectedFilters);
       }
     };
 
@@ -62,17 +53,17 @@ const FamilyFilterDropdown: React.FC<FamilyFilterDropdownProps> = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isOpen, toggleDropdown]);
+  }, [isOpen, toggleDropdown, selectedFilters]);
 
   // Apply selected filters to the main state
   const applyFilters = () => {
     setSelectedFilters(tempFilters);
-    toggleDropdown(); // Close the dropdown after applying filters
+    toggleDropdown();
   };
 
   // Reset the selected filters
   const resetFilters = () => {
-    setTempFilters([]); // Reset temp filters
+    setTempFilters([]);
   };
 
   return (
@@ -84,16 +75,16 @@ const FamilyFilterDropdown: React.FC<FamilyFilterDropdownProps> = ({
         Filter
       </button>
       {isOpen && (
-        <div className={"dropdown-menu"}>
+        <div className="dropdown-menu">
           {filterOptions.map((option) => (
-            <div key={option} className={"dropdown-item"}>
-              <label className={"dropdown-label"}>
+            <div key={option.value} className="dropdown-item">
+              <label className="dropdown-label">
                 <input
                   type="checkbox"
-                  checked={tempFilters.includes(option)}
-                  onChange={() => handleFilterChange(option)}
+                  checked={tempFilters.includes(option.value)}
+                  onChange={() => handleFilterChange(option.value)}
                 />
-                {option}
+                {option.display}
               </label>
             </div>
           ))}
