@@ -17,7 +17,7 @@ const MotifItem: React.FC<MotifItemProps> = ({
   onViewClick,
 }) => {
   const [openInNewTab, setOpenInNewTab] = useState(false);
-  const motifUrl = `/motif/${item.id}`;
+  const motifUrl = `${process.env.REACT_APP_BASENAME}/motif/${item.id}`;
 
   const handleClick = (event: React.MouseEvent) => {
     if (onViewClick && !openInNewTab) {

@@ -145,7 +145,7 @@ const FindNewMotifsProgress: React.FC<FindNewMotifsProgressProps> = ({
       </h2>
       {response && (
         <h3 style={{ marginTop: "0px", color: "green" }}>
-          Redirecting in {redirectCountdown} seconds
+          Redirecting in {redirectCountdown} seconds...
         </h3>
       )}
       {!response && (

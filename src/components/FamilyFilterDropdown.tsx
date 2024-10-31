@@ -17,7 +17,7 @@ const filterOptions = [
   "grp1",
   "16s",
   "23s",
-  "Others",
+  "Other",
 ];
 
 const FamilyFilterDropdown: React.FC<FamilyFilterDropdownProps> = ({
