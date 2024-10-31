@@ -108,7 +108,7 @@ const NewStructureInput: React.FC<NewStructureInputProps> = ({
         <button onClick={onClose} className="close-button">
           <i className="fas fa-times"></i>
         </button>
-        <h2 style={{marginBottom: '6px'}}>Find Motifs in a New Structure</h2>
+        <h2 style={{marginBottom: '6px'}}>Find Undesignable Motifs in an Input Structure</h2>
         <p className="p-nomargin info" style={{marginBottom: '6px'}}>
           (Pseudoknots are not allowed. Brackets other than '(' or ')' will be
           replaced with a dot)

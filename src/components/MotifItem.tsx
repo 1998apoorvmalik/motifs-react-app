@@ -26,7 +26,7 @@ const MotifItem: React.FC<MotifItemProps> = ({
             // color: item.id === "online" ? "Blue" : "inherit",
           }}
         >
-          ID: {item.id}
+          Motif ID: {item.id}
         </h2>
 
         <span className="info-icon">

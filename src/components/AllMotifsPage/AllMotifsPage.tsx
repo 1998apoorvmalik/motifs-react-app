@@ -196,7 +196,11 @@ const AllMotifsPage: React.FC = () => {
 
   return (
     <div>
-      <h1 style={{ textAlign: "center" }}>Motifs App</h1>
+      <h1 style={{ textAlign: "center" }}>FastMotif</h1>
+      <p  style={{ textAlign: "center", fontSize: '20px' }}>
+        Scalable and Interpretable Identification of Minimal Undesignable RNA
+        Structure Motifs with Rotational Invariance
+      </p>
       {/* <div style={{ display: "flex", justifyContent: "end", alignItems: "center" }}> */}
       <a href="https://github.com/shanry/RNA-Undesign/">
         <i className="fab fa-github" style={{ marginRight: "8px" }}></i>
@@ -294,7 +298,7 @@ const AllMotifsPage: React.FC = () => {
           <div>
             {/* Table-like header */}
             <div className="list-header">
-              <span>ID</span>
+              <span>Motif ID</span>
               <span>#Families</span>
               <span>#Occurrences</span>
               <span>Length</span>

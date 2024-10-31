@@ -154,13 +154,13 @@ export const motifService = {
                     motifs.push({
                       id: motifData.id_uniq > 361 ? 'New' : motifData.id_uniq,
                       numOccurences: motifData.numOccurences || 0,
-                      length: motifData.end - motifData.start + 1,
+                      length: motifData.length,
                       families: {},
                       bpairs: motifData.bpairs,
                       ipairs: motifData.ipairs,
-                      loops: motifData.ipairs.length + 1,
+                      loops: motifData.cardinality,
                       svg: parsedData.svgs[index]?.content || "",
-                      dotBracket: motifData['dot-bracket'],
+                      dotBracket: motifData['dot-bracket'][0],
                       structures_id: [],
                     });
                   });
