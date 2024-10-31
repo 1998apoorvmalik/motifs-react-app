@@ -56,7 +56,15 @@ const StructuresGridView: React.FC<GridProps> = ({
   }, [currentPage, itemsPerPage]);
 
   if (loading) {
-    return <div style={{ minHeight: "100vh" }}>Loading...</div>;
+    return (
+      <div
+        className="centered-container"
+        style={{ minHeight: "50vh", flexDirection: "column" }}
+      >
+          <p>Loading Structures...</p>
+          <i className="fas fa-spinner fa-spin fa-2x"></i> 
+      </div>
+    );
   }
 
   if (error) {
@@ -66,19 +74,17 @@ const StructuresGridView: React.FC<GridProps> = ({
   return (
     <div className="container">
       <div className="header-bar">
-        <div style={{ marginLeft: "16px" }}>
-          <ItemsPerPage
-            itemsPerPage={itemsPerPage}
-            onItemsPerPageChange={setItemsPerPage}
-          />
-        </div>
-
-        {/* Pagination Component */}
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
         />
+        <div style={{ marginRight: "16px" }}>
+          <ItemsPerPage
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={setItemsPerPage}
+          />
+        </div>
       </div>
 
       {/* Display structures in a grid */}

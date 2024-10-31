@@ -80,9 +80,30 @@ a {
   align-items: center; /* Vertically aligns items */
 }
 
+.centered-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
 .horizontal-spacer {
   background-color: #f8f8f8;
   height: 8px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: "center";
+  font-size: 14px;
+  margin: 0;
+  padding: 0;
+}
+
+.checkbox-label input[type="checkbox"] {
+  transform: scale(0.9);
+  margin: 0;
+  padding: 0;
 }
 
 .p-nomargin {
@@ -360,10 +381,10 @@ pre {
   padding: 8px;
   font-size: 16px;
   border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-left: 20px;
-  margin-right: 20px;
-  width: 200px;
+  border-radius: 4px;
+  margin-left: 24px;
+  margin-right: 24px;
+  min-width: 100px;
   outline: none;
 }
 

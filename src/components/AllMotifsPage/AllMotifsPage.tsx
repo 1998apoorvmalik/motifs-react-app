@@ -197,7 +197,7 @@ const AllMotifsPage: React.FC = () => {
   return (
     <div>
       <h1 style={{ textAlign: "center" }}>FastMotif</h1>
-      <p  style={{ textAlign: "center", fontSize: '20px' }}>
+      <p style={{ textAlign: "center", fontSize: "20px" }}>
         Scalable and Interpretable Identification of Minimal Undesignable RNA
         Structure Motifs with Rotational Invariance
       </p>
@@ -209,78 +209,78 @@ const AllMotifsPage: React.FC = () => {
       {/* </div> */}
       <div className="container">
         <div className="header-bar">
-          <div>
-            <button
-              className="new-structure-button"
-              onClick={handleNewButtonClick}
-            >
-              Input Structure
-            </button>
-
-            <NewStructureInput
-              placeholder="Enter dot-bracket structure"
-              onInputSubmit={handleDialogSubmit}
-              isVisible={isDialogVisible}
-              onClose={handleCloseDialog}
-            />
-          </div>
-
-          {/* View toggle buttons */}
-          <div className="view-toggle">
-            <button
-              className={`view-button ${viewMode === "grid" ? "active" : ""}`}
-              onClick={() => setViewMode("grid")}
-            >
-              <i className="fas fa-th-large"></i> Icon View
-            </button>
-            <button
-              className={`view-button ${viewMode === "list" ? "active" : ""}`}
-              onClick={() => setViewMode("list")}
-            >
-              <i className="fas fa-list"></i> List View
-            </button>
-          </div>
-
-          <SearchBar
-            searchQuery={searchQuery}
-            onSearchQueryChange={(e) => {
-              console.log("Search query changed:", e);
-              return setSearchQuery(e);
-            }}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
           />
 
           <div className="header-section">
-            <FamilyFilterDropdown
-              isOpen={isFilterOpen}
-              toggleDropdown={toggleFilterDropdown}
-              selectedFilters={selectedFilters}
-              setSelectedFilters={setSelectedFilters}
-            />
+            <div>
+              <button
+                className="new-structure-button"
+                onClick={handleNewButtonClick}
+              >
+                Input Structure
+              </button>
 
-            <SortDropdown
-              isOpen={isSortOpen}
-              toggleDropdown={toggleSortDropdown}
-              selectedSort={selectedSort}
-              setSelectedSort={setSelectedSort}
-              sortOrder={sortOrder}
-              setSortOrder={setSortOrder}
+              <NewStructureInput
+                placeholder="Enter dot-bracket structure"
+                onInputSubmit={handleDialogSubmit}
+                isVisible={isDialogVisible}
+                onClose={handleCloseDialog}
+              />
+            </div>
+            <SearchBar
+              searchQuery={searchQuery}
+              onSearchQueryChange={(e) => {
+                console.log("Search query changed:", e);
+                return setSearchQuery(e);
+              }}
             />
+            <div className="view-toggle">
+              <button
+                className={`view-button ${viewMode === "grid" ? "active" : ""}`}
+                onClick={() => setViewMode("grid")}
+              >
+                <i className="fas fa-th-large"></i> Icon View
+              </button>
+              <button
+                className={`view-button ${viewMode === "list" ? "active" : ""}`}
+                onClick={() => setViewMode("list")}
+              >
+                <i className="fas fa-list"></i> List View
+              </button>
+            </div>
+          </div>
 
+          <div className="centered-container">
+            <div className="centered-container" style={{ gap: "0px" }}>
+              <FamilyFilterDropdown
+                isOpen={isFilterOpen}
+                toggleDropdown={toggleFilterDropdown}
+                selectedFilters={selectedFilters}
+                setSelectedFilters={setSelectedFilters}
+              />
+
+              <SortDropdown
+                isOpen={isSortOpen}
+                toggleDropdown={toggleSortDropdown}
+                selectedSort={selectedSort}
+                setSelectedSort={setSelectedSort}
+                sortOrder={sortOrder}
+                setSortOrder={setSortOrder}
+              />
+            </div>
             <div
               className="center"
-              style={{ marginLeft: "12px", marginRight: "8px" }}
+              style={{ marginLeft: "8px", marginRight: "16px" }}
             >
               <ItemsPerPage
                 itemsPerPage={itemsPerPage}
                 onItemsPerPageChange={setItemsPerPage}
               />
             </div>
-
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
           </div>
         </div>
 

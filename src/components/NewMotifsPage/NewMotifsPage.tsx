@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Motif from "../../interfaces/Motif";
 import MotifItem from "../MotifItem";
 import Pagination from "../Pagination";
 import ItemsPerPage from "../ItemsPerPage";
+import MotifFilterDropdown from "./MotifFilterDropdown";
 
 interface LocationState {
   motifs: Motif[];
@@ -12,23 +13,37 @@ interface LocationState {
 const NewMotifsPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { motifs } = location.state as LocationState;
 
-  // Pagination states
+  const [redirecting, setRedirecting] = useState(false);
+
+  const motifs = useMemo(
+    () => (location.state as LocationState)?.motifs || [],
+    [location.state]
+  );
+
+   // Calculate newMotifCount based on the original motifs array
+   const newMotifCount = useMemo(
+    () => motifs.filter((motif) => motif.id === "New").length,
+    [motifs]
+  );
+
+  useEffect(() => {
+    if (!location.state) {
+      setRedirecting(true);
+      setTimeout(() => navigate("/"), 2000);
+    }
+  }, [location.state, navigate]);
+
+  // Pagination and filtering states
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(5);
   const [totalPages, setTotalPages] = useState(1);
-  const [newMotifCount, setNewMotifCount] = useState(0);
+  const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
+  const [isFilterDropdownOpen, setFilterDropdownOpen] = useState(false);
 
+  // Count new motifs when motifs data changes
   useEffect(() => {
-    const newMotifs = motifs.filter((motif) => motif.id === "New");
-    setNewMotifCount(newMotifs.length);
-  }, [motifs]);
-
-  useEffect(() => {
-    // Calculate total pages based on motifs length and items per page
     setTotalPages(Math.ceil(motifs.length / itemsPerPage));
-    // Reset to the first page when items per page changes
     setCurrentPage(1);
   }, [motifs.length, itemsPerPage]);
 
@@ -36,10 +51,30 @@ const NewMotifsPage: React.FC = () => {
     navigate("/");
   };
 
-  // Calculate the index range for the current page
+  const toggleFilterDropdown = () => {
+    setFilterDropdownOpen(!isFilterDropdownOpen);
+  };
+
+  // Filter motifs based on the selected filter
+  const filteredMotifs = motifs.filter((motif) =>
+    selectedFilter === "New Motif"
+      ? motif.id === "New"
+      : selectedFilter === "Old Motif"
+      ? motif.id !== "New"
+      : true
+  );
+
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentMotifs = motifs.slice(startIndex, endIndex);
+  const currentMotifs = filteredMotifs.slice(startIndex, endIndex);
+
+  if (redirecting) {
+    return (
+      <h2>
+        You cannot navigate to this page directly! Redirecting to homepage...
+      </h2>
+    );
+  }
 
   return (
     <div>
@@ -53,26 +88,34 @@ const NewMotifsPage: React.FC = () => {
       <h2 style={{ textAlign: "center" }}>
         {motifs.length > 0
           ? `Found ${motifs.length} (${newMotifCount} New) Undesignable ${
-              motifs.length == 1 ? "Motif" : "Motifs"
+              motifs.length === 1 ? "Motif" : "Motifs"
             } in the Input Structure`
           : "No Undesignable Motifs Found in the Input Structure!"}
       </h2>
       <div className="container">
         <div className="header-bar">
-          <div style={{ marginLeft: "16px" }}>
-            <ItemsPerPage
-              itemsPerPage={itemsPerPage}
-              onItemsPerPageChange={(value) => {
-                setItemsPerPage(value);
-                setCurrentPage(1); // Reset to first page when items per page changes
-              }}
-            />
-          </div>
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={(page) => setCurrentPage(page)} // Ensure page updates
+            onPageChange={(page) => setCurrentPage(page)}
           />
+          <div className="centered-container">
+            <MotifFilterDropdown
+              isOpen={isFilterDropdownOpen}
+              toggleDropdown={toggleFilterDropdown}
+              selectedFilter={selectedFilter}
+              setSelectedFilter={setSelectedFilter}
+            />
+            <div style={{ marginLeft: "8px", marginRight: "16px" }}>
+              <ItemsPerPage
+                itemsPerPage={itemsPerPage}
+                onItemsPerPageChange={(value) => {
+                  setItemsPerPage(value);
+                  setCurrentPage(1);
+                }}
+              />
+            </div>
+          </div>
         </div>
         <div
           className="grid-container"
@@ -83,7 +126,11 @@ const NewMotifsPage: React.FC = () => {
               key={index}
               item={item}
               height="60vh"
-              onViewClick={() => console.log(item)}
+              onViewClick={
+                item.id !== "New"
+                  ? () => navigate(`/motif/${item.id}`)
+                  : undefined
+              }
             />
           ))}
         </div>

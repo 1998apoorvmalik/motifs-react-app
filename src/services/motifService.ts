@@ -1,5 +1,5 @@
 import axios from "axios";
-import Motif from "../interfaces/Motif";
+import Motif, { motifFromJson } from "../interfaces/Motif";
 import Structure from "../interfaces/Structure";
 
 const API_URL = process.env.REACT_APP_API_URL || "/127.0.0.1:5000";
@@ -38,6 +38,38 @@ export const motifService = {
     return 0;
   },
 
+  async getMotif(id: string): Promise<Motif> {
+    try {
+      // console.log("Fetching Motif with ID:", id); // Debugging line
+      const response = await axios.get(API_URL + "/motif", {
+        params: { id },
+      });
+      return motifFromJson(response.data);
+    } catch (error: unknown) {
+      this._handleError(error);
+    }
+    return {} as Motif; // Return an empty motif in case of error
+  },
+
+  async getStructure(id: string): Promise<Structure> {
+    try {
+      // console.log("Fetching Structure with ID:", id); // Debugging line
+      const response = await axios.get(API_URL + "/structure", {
+        params: { id },
+      });
+
+      const structure: Structure = {
+        id: response.data.id,
+        family: response.data.id.split("_")[0],
+        svgContent: response.data.svg_content,
+      };
+      return structure;
+    } catch (error: unknown) {
+      this._handleError(error);
+    }
+    return {} as Structure; // Return an empty structure in case of error
+  },
+
   async getFilteredPaginatedMotifs(
     page: number,
     limit: number,
@@ -61,18 +93,7 @@ export const motifService = {
         },
       });
 
-      const motifs: Motif[] = response.data.motifs.map((motif: any) => ({
-        id: motif._id,
-        numOccurences: motif.occurrences.length,
-        length: motif.length,
-        families: motif.family2count,
-        bpairs: motif.bpairs,
-        ipairs: motif.ipairs,
-        loops: motif.cardinality,
-        svg: motif.motif_svg,
-        dotBracket: motif['dot-bracket'][0],
-        structures_id: motif.occurrences,
-      }));
+      const motifs: Motif[] = response.data.motifs.map(motifFromJson);
 
       return {
         totalItems: response.data.totalItems,
@@ -85,24 +106,6 @@ export const motifService = {
       totalItems: 0,
       motifs: [],
     };
-  },
-
-  async getStructure(id: string): Promise<Structure> {
-    try {
-      const response = await axios.get(API_URL + "/structure", {
-        params: { id },
-      });
-
-      const structure: Structure = {
-        id: response.data.id,
-        family: response.data.id.split("_")[0],
-        svgContent: response.data.svg_content,
-      };
-      return structure;
-    } catch (error: unknown) {
-      this._handleError(error);
-    }
-    return {} as Structure; // Return an empty structure in case of error
   },
 
   async newStructure(
@@ -151,18 +154,12 @@ export const motifService = {
                 } else if (parsedData.motifs && parsedData.svgs) {
                   parsedData.motifs.forEach((motifData: any, index: number) => {
                     // console.log(motifData.id, motifData.id_uniq); // debugging line
-                    motifs.push({
-                      id: motifData.id_uniq > 361 ? 'New' : motifData.id_uniq,
-                      numOccurences: motifData.numOccurences || 0,
-                      length: motifData.length,
-                      families: {},
-                      bpairs: motifData.bpairs,
-                      ipairs: motifData.ipairs,
-                      loops: motifData.cardinality,
-                      svg: parsedData.svgs[index]?.content || "",
-                      dotBracket: motifData['dot-bracket'][0],
-                      structures_id: [],
-                    });
+                    const newMotif = motifFromJson(motifData);
+                    newMotif.id =
+                      (motifData.id_uniq > 361 ? "New" : motifData.id_uniq) ||
+                      motifData.id; // Use id_uniq if available
+                    newMotif.svg = parsedData.svgs[index]?.content || "";
+                    motifs.push(newMotif);
                   });
                 }
               } catch (e) {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Motif from "./../../interfaces/Motif";
 import Structure from "../../interfaces/Structure";
@@ -7,13 +7,18 @@ import {
   ExpandedMotifPageState,
 } from "../../interfaces/MotifPageState";
 import StructuresGridView from "./StructuresGridView";
+import LoadingSpinner from "../LoadingSpinnner";
 import SvgViewer from "../SvgViewer";
 import CopyableTextBlock from "../CopyableTextBlock";
+import { motifService } from "./../../services/motifService"; // Import the service to fetch motifs
 
 const ExpandedMotifView: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const item = location.state?.motif as Motif | undefined;
+
+  const initialItem = location.state?.motif as Motif | undefined;
+  const [item, setItem] = useState<Motif | undefined>(initialItem);
+  const [loading, setLoading] = useState(!initialItem); // Set loading to true if initialItem is undefined
 
   const restoredExpandedMotifPageState =
     (location.state?.expandedMotifPageState as ExpandedMotifPageState) || {};
@@ -24,6 +29,26 @@ const ExpandedMotifView: React.FC = () => {
 
   const [currentPage, setCurrentPage] = useState<number>(initialCurrentPage);
   const [itemsPerPage, setItemsPerPage] = useState<number>(initialItemsPerPage);
+
+  useEffect(() => {
+    // Fetch the motif if it's not available in location.state
+    if (!item) {
+      const motifID = location.pathname.split("/").pop(); // Extract motif ID from URL
+      if (motifID) {
+        const fetchMotif = async () => {
+          setLoading(true); // Start loading
+          const fetchedMotif = await motifService.getMotif(motifID);
+          setItem(fetchedMotif);
+          setLoading(false); // Stop loading after fetch
+        };
+        fetchMotif();
+      }
+    }
+  }, [item, location.pathname]);
+
+  if (loading) {
+    return <LoadingSpinner message="Loading Motif..." />;
+  }
 
   if (!item) {
     return <h1>Error: Motif not found</h1>;
@@ -52,13 +77,15 @@ const ExpandedMotifView: React.FC = () => {
 
   return (
     <div>
-      <button
-        className="back-button"
-        onClick={handleBackClick}
-        style={{ marginTop: "16px" }}
-      >
-        {"< Back to All Motifs Page"}
-      </button>
+      {location.state?.motif && (
+        <button
+          className="back-button"
+          onClick={handleBackClick}
+          style={{ marginTop: "16px" }}
+        >
+          {"< Back to All Motifs Page"}
+        </button>
+      )}
       <h1>Motif ID: {item.id}</h1>
       <div className="inline-container">
         <strong style={{ marginRight: "4px" }}>Families:</strong>
@@ -89,7 +116,10 @@ const ExpandedMotifView: React.FC = () => {
         Number of Loops: {item.loops}
       </p>
 
-      <CopyableTextBlock text={item.dotBracket} label="Dot-Bracket Structure" />
+      <CopyableTextBlock
+        text={item.dotBracket?.[0] || ""}
+        label="Dot-Bracket Structure"
+      />
 
       <h2
         style={{ textAlign: "center", marginTop: "48px", marginBottom: "8px" }}
