@@ -139,6 +139,7 @@ export const motifService = {
           const chunk = decoder.decode(value, { stream: true });
           partialData += chunk;
 
+          console.log("Received chunk:", chunk);
           const lines = partialData.split("\n\n");
           partialData = lines.pop() || "";
 
@@ -150,6 +151,7 @@ export const motifService = {
                 if (parsedData.error) {
                   reject(new Error(parsedData.error));
                 } else if (parsedData.progress) {
+                  // console.log(parsedData.progress); // Debugging line
                   onProgress(parsedData.progress);
                 } else if (parsedData.motifs && parsedData.svgs) {
                   parsedData.motifs.forEach((motifData: any, index: number) => {
