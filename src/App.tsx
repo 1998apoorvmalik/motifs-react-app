@@ -9,16 +9,19 @@ import ExpandedStructureView from "./components/ExpandedStructureView";
 import NewMotifsPage from "./components/NewMotifsPage/NewMotifsPage";
 
 const App: React.FC = () => {
-  return (
-    <Router basename={process.env.REACT_APP_BASENAME}>
-      <Routes>
-        <Route path="/" element={<AllMotifsPage />} />
-        <Route path="/new" element={<NewMotifsPage />} />
-        <Route path="/motif/:id" element={<ExpandedMotifView />} />
-        <Route path="/structure/:id" element={<ExpandedStructureView />} />
-      </Routes>
-    </Router>
-  );
+    return (
+        <Router basename={process.env.REACT_APP_BASENAME}>
+            <Routes>
+                <Route path="/" element={<AllMotifsPage />} />
+                <Route path="/new" element={<NewMotifsPage />} />
+                <Route path="/motif/:id" element={<ExpandedMotifView />} />
+                <Route
+                    path="/structure/:id"
+                    element={<ExpandedStructureView />}
+                />
+            </Routes>
+        </Router>
+    );
 };
 
 export default App;
