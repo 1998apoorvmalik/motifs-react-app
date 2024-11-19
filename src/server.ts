@@ -2,28 +2,40 @@
 import path from "path";
 import express, { Request, Response } from "express";
 import cors from "cors";
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 
 const app = express();
+// const { createProxyMiddleware } = require("http-proxy-middleware");
 
-const PORT = 5001;
+const SERVER_URL = "127.0.0.1"
+const PORT = 8082;
 
 const API_URL = process.env.NODE_ENV === "production" ?
-    "http://127.0.0.1:5000" : "http://127.0.0.1:5000";
+    "http://10.217.112.20:5000" : "http://10.217.112.20:5000";
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from React's build directory
-app.use(express.static(path.join(__dirname, "../../motifs-react-app/build")));
+// Serve static files from the React app build directory
+app.use("/motifs", express.static(path.join(__dirname, "../../motifs-react-app/build")));
+
+// // Proxy requests to Flask (root `/`)
+// app.use(
+//     "/",
+//     createProxyMiddleware({
+//       target: "http://127.0.0.1:8081", // Flask app running on this port
+//       changeOrigin: true,
+//     })
+//   );
 
 // Routes
 app.get("/hello", (req: Request, res: Response) => {
     res.json({ message: "Hello from Motifs Frontend Server!" });
 });
 
-app.get("/api/total", async (req: Request, res: Response) => {
+
+app.get("/motifs/api/total", async (req: Request, res: Response) => {
     try {
         console.log("[INFO] Fetching total motifs count from the API");
         const response = await axios.get(API_URL + "/total");
@@ -36,7 +48,7 @@ app.get("/api/total", async (req: Request, res: Response) => {
 });
 
 
-app.get("/api/motif", async (req: Request, res: Response) => {
+app.get("/motifs/api/motif", async (req: Request, res: Response) => {
     try {
         console.log("[INFO] Fetching motif from the API");
         const response = await axios.get(API_URL + "/api/motif", { params: req.query });
@@ -48,7 +60,8 @@ app.get("/api/motif", async (req: Request, res: Response) => {
     }
 });
 
-app.get("/api/motifs", async (req: Request, res: Response) => {
+
+app.get("/motifs/api/motifs", async (req: Request, res: Response) => {
     try {
         console.log("[INFO] Fetching motifs from the API");
         const response = await axios.get(API_URL + "/api/motifs", { params: req.query });
@@ -60,7 +73,8 @@ app.get("/api/motifs", async (req: Request, res: Response) => {
     }
 });
 
-app.get("/api/structure", async (req: Request, res: Response) => {
+
+app.get("/motifs/api/structure", async (req: Request, res: Response) => {
     try {
         console.log("[INFO] Fetching structure from the API");
         const response = await axios.get(API_URL + "/api/structure", { params: req.query });
@@ -72,40 +86,37 @@ app.get("/api/structure", async (req: Request, res: Response) => {
     }
 });
 
-app.post('/api/new', async (req: Request, res: Response) => {
+
+app.post('/motifs/api/new', async (req: Request, res: Response) => {
     try {
         console.log('[INFO] Forwarding streaming request to backend server');
 
         // Forward the request to the backend server with streaming enabled
         const backendResponse = await axios.post(API_URL + '/api/new', req.body, {
             responseType: 'stream',
+            decompress: false, // Ensure data is streamed directly
         });
 
         // Set streaming headers for the client
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
+        res.setHeader('X-Accel-Buffering', 'no'); 
         res.flushHeaders(); // Flush headers immediately to start the stream
 
-        // Pipe the streaming response to the client
-        const backendStream = backendResponse.data as NodeJS.ReadableStream;
-
-        backendStream.pipe(res);
-
-        // Ensure the response ends cleanly when the backend stream ends
-        backendStream.on('end', () => {
-            console.log('[INFO] Backend stream ended');
-            res.end();
+        // Pipe the backend stream directly to the client
+        backendResponse.data.on('data', (chunk: Buffer) => {
+            res.write(chunk); // Write the data chunk immediately
         });
 
-        // Handle backend stream errors
-        backendStream.on('error', (error: Error) => {
+        backendResponse.data.on('end', () => {
+            console.log('[INFO] Backend stream ended');
+            res.end(); // End the response when backend finishes streaming
+        });
+
+        backendResponse.data.on('error', (error: Error) => {
             console.error('[ERROR] Backend stream error:', error.message);
-            if (!res.headersSent) {
-                res.status(500).json({ error: 'Streaming error from backend' });
-            } else {
-                res.end(); // Close the stream to the client
-            }
+            res.status(500).json({ error: 'Streaming error from backend' });
         });
     } catch (error: unknown) {
         console.error('[ERROR] Request to backend server failed');
@@ -133,6 +144,7 @@ app.post('/api/new', async (req: Request, res: Response) => {
     }
 });
 
+
 // React fallback route for client-side routing
 app.get("*", (_: Request, res: Response) => {
     res.sendFile(
@@ -143,6 +155,5 @@ app.get("*", (_: Request, res: Response) => {
 
 // Start server
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server is running on ${SERVER_URL}:${PORT}`);
 });
-
