@@ -2,6 +2,7 @@
   "name": "motifs",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/motifs",
   "dependencies": {
     "@fortawesome/fontawesome-free": "*",
     "@testing-library/jest-dom": "*",

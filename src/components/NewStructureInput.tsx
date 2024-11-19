@@ -8,10 +8,9 @@ interface NewStructureInputProps {
 }
 
 const predefinedStructures = {
-    "Sample 1": "(.(.(...)...))",
-    "Sample 2": "(.(...(...)..)..)",
-    "Sample 3":
-        ".((......((......))......((......((......))......((......))......))......)).....",
+  "Sample 1": "(.(.(...)...))",
+  "Sample 2": "(.(...(...)..)..)",
+  "Sample 3": ".((......((......))......((......((......))......((......))......))......)).....",
 };
 
 const NewStructureInput: React.FC<NewStructureInputProps> = ({
