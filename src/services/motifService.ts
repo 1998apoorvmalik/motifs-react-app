@@ -1,10 +1,9 @@
+// src/services/motifService.ts
 import axios from "axios";
 import Motif, { motifFromJson } from "../interfaces/Motif";
-import Structure from "../interfaces/Structure";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:5000";
 
-// Service to fetch paginated motif data
 export const motifService = {
     async _handleError(error: unknown): Promise<void> {
         // Handle the error and throw it to be caught in the component
@@ -49,25 +48,6 @@ export const motifService = {
             this._handleError(error);
         }
         return {} as Motif; // Return an empty motif in case of error
-    },
-
-    async getStructure(id: string): Promise<Structure> {
-        try {
-            // console.log("Fetching Structure with ID:", id); // Debugging line
-            const response = await axios.get(API_URL + "/structure", {
-                params: { id },
-            });
-
-            const structure: Structure = {
-                id: response.data.id,
-                family: response.data.id.split("_")[0],
-                svgContent: response.data.svg_content,
-            };
-            return structure;
-        } catch (error: unknown) {
-            this._handleError(error);
-        }
-        return {} as Structure; // Return an empty structure in case of error
     },
 
     async getFilteredPaginatedMotifs(

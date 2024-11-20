@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Motif from "../../interfaces/Motif";
-import MotifItem from "../MotifItem";
+import MotifItem from "../GridItem";
 import Pagination from "../Pagination";
 import ItemsPerPage from "../ItemsPerPage";
 import MotifFilterDropdown from "./MotifFilterDropdown";

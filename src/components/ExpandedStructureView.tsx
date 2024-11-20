@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import LoadingSpinner from "./LoadingSpinnner";
 import SvgViewer from "./SvgViewer";
-import { motifService } from "./../services/motifService"; // Assuming you have a service to fetch structures
+// import { motifService } from "./../services/motifService"; // Assuming you have a service to fetch structures
+import { structureService } from "../services/structureService";
 
 const ExpandedStructureView: React.FC = () => {
     const location = useLocation();
@@ -14,14 +15,16 @@ const ExpandedStructureView: React.FC = () => {
     const [loading, setLoading] = useState(!location.state?.structure); // Initialize loading state
     const url = location.pathname;
     const structureID = url.split("/").pop(); // Extract the structure ID from the URL
+    const motifNum = structureID?.split("_").slice(-1)[0];
 
     useEffect(() => {
         // Fetch the structure if it's not available in location.state
         if (!structure && structureID) {
             const fetchStructure = async () => {
                 setLoading(true); // Set loading to true while fetching
-                const fetchedStructure = await motifService.getStructure(
-                    structureID
+                const fetchedStructure = await structureService.getStructure(
+                    structureID,
+                    [motifNum || ""]
                 );
                 setStructure(fetchedStructure);
                 setLoading(false); // Set loading to false after fetching

@@ -2,13 +2,14 @@
 import { familyDisplayMap } from "../constants/familyMapping";
 
 export default interface Motif {
+    type: "motif";
     id: string;
     numOccurences: number;
     length: number;
     families: { [familyName: string]: number };
     bpairs: number[][];
     ipairs: number[][];
-    loops: number;
+    numLoops: number;
     svg: string;
     dotBracket: string[];
     structures_id: string[];
@@ -24,13 +25,14 @@ export function motifFromJson(data: any): Motif {
     );
 
     return {
+        type: "motif",
         id: data._id || "unknown",
         numOccurences: data.occurrences?.length || 0,
         length: data.length || 0,
         families, // Mapped family names with correct typing
         bpairs: data.bpairs || [],
         ipairs: data.ipairs || [],
-        loops: data.cardinality || 0,
+        numLoops: data.cardinality || 0,
         svg: data.motif_svg || "",
         dotBracket: data["dot-bracket"] || [],
         structures_id: data.occurrences || [],

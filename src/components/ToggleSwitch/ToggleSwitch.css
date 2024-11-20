@@ -1,0 +1,57 @@
+.toggle-switch {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .label {
+    font-size: 16px;
+    /* color: #666; */
+    transition: color 0.2s;
+  }
+  
+  .label.active {
+    font-weight: bold;
+    /* color: #333; */
+  }
+  
+  .switch {
+    position: relative;
+    width: 50px;
+    height: 24px;
+    background-color: #ccc;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    transition: background-color 0.3s;
+  }
+  
+  .switch.left {
+    background-color: #4caf50;
+  }
+  
+  .switch.right {
+    background-color: #f44336;
+  }
+  
+  .toggle {
+    width: 20px;
+    height: 20px;
+    background-color: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s;
+  }
+  
+  .switch.left .toggle {
+    transform: translateX(-12px);
+  }
+  
+  .switch.right .toggle {
+    transform: translateX(12px);
+  }
+  

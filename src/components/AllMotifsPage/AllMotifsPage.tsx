@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import Motif from "../../interfaces/Motif";
-import { MotifPageState } from "../../interfaces/MotifPageState";
+import { ItemsPageState } from "../../interfaces/ItemsPageState";
 import { motifService } from "../../services/motifService";
 import SearchBar from "../SearchBar";
 import FamilyFilterDropdown from "../FamilyFilterDropdown";
@@ -11,24 +11,32 @@ import SortDropdown from "./SortDropdown";
 import Pagination from "../Pagination";
 import ItemsPerPage from "../ItemsPerPage";
 import MotifListItem from "./MotifListItem";
-import MotifItem from "../MotifItem";
+import MotifItem from "../GridItem";
 import NewStructureInput from "./../NewStructureInput";
 import LoadingSpinner from "../LoadingSpinnner";
 import FindNewMotifsProgress from "./FindNewMotifsProgress";
+import ToggleSwitch from "../ToggleSwitch/ToggleSwitch";
+import Structure from "../../interfaces/Structure";
+import { structureService } from "../../services/structureService";
+import StructureItem from "../StructureItem";
 
 const AllMotifsPage: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const restoredMotifPageState = (location.state as MotifPageState) || {};
-    const initialViewMode = restoredMotifPageState.viewMode || "grid";
-    const initialCurrentPage = restoredMotifPageState.currentPage || 1;
-    const initialItemsPerPage = restoredMotifPageState.itemsPerPage || 30;
-    const initialSearchQuery = restoredMotifPageState.searchQuery || "";
-    const initialSelectedFilters = restoredMotifPageState.selectedFilters || [];
+    // motifs or structures view
+    const [itemType, setItemType] = useState<"motifs" | "structs">("motifs");
+
+    const restoredItemsPageState = (location.state as ItemsPageState) || {};
+    const initialViewMode = restoredItemsPageState.viewMode || "grid";
+    const initialCurrentPage = restoredItemsPageState.currentPage || 1;
+    const initialItemsPerPage = restoredItemsPageState.itemsPerPage || 30;
+    const initialSearchQuery = restoredItemsPageState.searchQuery || "";
+    const initialSelectedFilters = restoredItemsPageState.selectedFilters || [];
     const initialSelectedSort =
-        restoredMotifPageState.selectedSort || "Number of Families";
-    const initialSortOrder = restoredMotifPageState.sortOrder || "desc";
+        restoredItemsPageState.selectedSort ||
+        (itemType === "motifs" ? "Number of Families" : "Number of Motifs");
+    const initialSortOrder = restoredItemsPageState.sortOrder || "desc";
 
     const [isFilterOpen, setFilterOpen] = useState(false);
     const [isSortOpen, setSortOpen] = useState(false);
@@ -52,7 +60,7 @@ const AllMotifsPage: React.FC = () => {
     const [itemsPerPage, setItemsPerPage] =
         useState<number>(initialItemsPerPage);
     const [currentPage, setCurrentPage] = useState(initialCurrentPage);
-    const [motifs, setMotifs] = useState<Motif[]>([]); // State to store the fetched motifs
+    const [items, setItems] = useState<Motif[] | Structure[]>([]); // State to store the fetched motifs
     const [totalPages, setTotalPages] = useState(1); // State for total number of pages
 
     // New Structure Process States
@@ -82,7 +90,7 @@ const AllMotifsPage: React.FC = () => {
                     selectedSort,
                     sortOrder
                 );
-                setMotifs(data.motifs); // Set the fetched motifs
+                setItems(data.motifs); // Set the fetched motifs
                 const totalPages = Math.ceil(data.totalItems / itemsPerPage);
                 setCurrentPage(Math.max(Math.min(currentPage, totalPages), 1)); // Reset current page if it exceeds total pages
                 setTotalPages(totalPages); // Calculate total pages
@@ -97,8 +105,39 @@ const AllMotifsPage: React.FC = () => {
             }
         };
 
-        fetchMotifs();
+        const fetchStructures = async () => {
+            console.log("Fetching structures...");
+            setLoadingMotifs(true);
+            setError(null); // Clear previous errors
+            try {
+                const data =
+                    await structureService.getFilteredPaginatedStructures(
+                        currentPage,
+                        itemsPerPage,
+                        selectedFilters,
+                        searchQuery,
+                        selectedSort,
+                        sortOrder
+                    );
+
+                setItems(data.strucs); // Set the fetched structures
+                const totalPages = Math.ceil(data.totalItems / itemsPerPage);
+                setCurrentPage(Math.max(Math.min(currentPage, totalPages), 1)); // Reset current page if it exceeds total pages
+                setTotalPages(totalPages); // Calculate total pages
+            } catch (err) {
+                setError(
+                    err instanceof Error
+                        ? err.message
+                        : "Unknown error occurred"
+                );
+            } finally {
+                setLoadingMotifs(false); // Stop loading after the request completes
+            }
+        };
+
+        itemType === "motifs" ? fetchMotifs() : fetchStructures();
     }, [
+        itemType,
         currentPage,
         itemsPerPage,
         searchQuery,
@@ -107,8 +146,8 @@ const AllMotifsPage: React.FC = () => {
         sortOrder,
     ]);
 
-    const handleViewClick = (motif: Motif) => {
-        const motifPageState: MotifPageState = {
+    const handleViewClick = (item: Motif | Structure) => {
+        const itemsPageState: ItemsPageState = {
             viewMode,
             currentPage,
             itemsPerPage,
@@ -117,10 +156,10 @@ const AllMotifsPage: React.FC = () => {
             selectedSort,
             sortOrder,
         };
-        navigate(`/motif/${motif.id}`, {
+        navigate(`/item/${item.id}`, {
             state: {
-                motif,
-                motifPageState,
+                item,
+                itemsPageState,
             },
         });
     };
@@ -188,7 +227,13 @@ const AllMotifsPage: React.FC = () => {
 
     // Render loading, error, or the grid of motifs
     if (loadingMotifs) {
-        return <LoadingSpinner message="Loading Motifs..." />;
+        return (
+            <LoadingSpinner
+                message={`Loading ${
+                    itemType === "motifs" ? "Motifs" : "Structures"
+                }...`}
+            />
+        );
     }
 
     if (loadingNewMotifs) {
@@ -207,6 +252,55 @@ const AllMotifsPage: React.FC = () => {
         return <div>Error: {error}</div>;
     }
 
+    const renderItems = () => {
+        if (viewMode === "grid") {
+            return (
+                <div className="grid-container">
+                    {items.map((item, index) => (
+                        // itemType === "motifs" ? (
+                        //     <MotifItem
+                        //         key={index}
+                        //         item={item as Motif}
+                        //         onViewClick={() =>
+                        //             handleViewClick(item as Motif)
+                        //         }
+                        //     />
+                        // ) : (
+                        //     <StructureItem
+                        //         key={index}
+                        //         // index={(currentPage - 1) * itemsPerPage + index}
+                        //         item={item as Structure}
+                        //         onViewClick={() => {}}
+                        //     />
+                        // )
+                        <MotifItem
+                            key={index}
+                            item={item as Motif}
+                            onViewClick={() => handleViewClick(item as Motif)}
+                        />
+                    ))}
+                </div>
+            );
+        } else {
+            return (
+                <div>
+                    <div className="list-header">
+                        <span>Motif ID</span>
+                        <span>#Families</span>
+                        <span>#Occurrences</span>
+                        <span>Length</span>
+                        <span>#Boundary Pairs</span>
+                        <span>#Internal Pairs</span>
+                        <span>#Loops</span>
+                    </div>
+                    <div className="list-container">
+                        {/* Map items here when ready */}
+                    </div>
+                </div>
+            );
+        }
+    };
+
     return (
         <div>
             <h1 style={{ textAlign: "center" }}>FastMotif</h1>
@@ -214,6 +308,23 @@ const AllMotifsPage: React.FC = () => {
                 Scalable and Interpretable Identification of Minimal
                 Undesignable RNA Structure Motifs with Rotational Invariance
             </p>
+            <ToggleSwitch
+                leftLabel="Motifs"
+                rightLabel="Structures"
+                isLeft={itemType === "motifs"}
+                onToggle={() => {
+                    const newType =
+                        itemType === "motifs" ? "structs" : "motifs";
+                    setLoadingMotifs(true);
+                    setItemType(newType);
+                    setSelectedSort(
+                        newType === "motifs"
+                            ? "Number of Families"
+                            : "Number of Motifs"
+                    );
+                    setItemsPerPage(newType === "motifs" ? 30 : 5);
+                }}
+            />
             {/* <div style={{ display: "flex", justifyContent: "end", alignItems: "center" }}> */}
             <a href="https://github.com/shanry/RNA-Undesign/">
                 <i className="fab fa-github" style={{ marginRight: "8px" }}></i>
@@ -284,6 +395,7 @@ const AllMotifsPage: React.FC = () => {
                             />
 
                             <SortDropdown
+                                itemType={itemType}
                                 isOpen={isSortOpen}
                                 toggleDropdown={toggleSortDropdown}
                                 selectedSort={selectedSort}
@@ -303,40 +415,7 @@ const AllMotifsPage: React.FC = () => {
                         </div>
                     </div>
                 </div>
-
-                {viewMode === "grid" ? (
-                    <div className="grid-container">
-                        {motifs.map((item, index) => (
-                            <MotifItem
-                                key={index}
-                                item={item}
-                                onViewClick={() => handleViewClick(item)}
-                            />
-                        ))}
-                    </div>
-                ) : (
-                    <div>
-                        {/* Table-like header */}
-                        <div className="list-header">
-                            <span>Motif ID</span>
-                            <span>#Families</span>
-                            <span>#Occurrences</span>
-                            <span>Length</span>
-                            <span>#Boundary Pairs</span>
-                            <span>#Internal Pairs</span>
-                            <span>#Loops</span>
-                        </div>
-                        <div className="list-container">
-                            {motifs.map((item, index) => (
-                                <MotifListItem
-                                    key={index}
-                                    item={item}
-                                    onViewClick={() => handleViewClick(item)}
-                                />
-                            ))}
-                        </div>
-                    </div>
-                )}
+                {renderItems()}
             </div>
         </div>
     );

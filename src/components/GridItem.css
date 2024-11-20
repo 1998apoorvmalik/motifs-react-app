@@ -1,0 +1,33 @@
+.svg-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+    margin-bottom: 18px;
+    gap: 10px;
+}
+
+.nav-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+.nav-button:hover {
+    background-color: #0056b3;
+}
+
+.nav-button.disabled {
+    background-color: #d6d6d6;
+    cursor: not-allowed;
+}
+
+.svg-index {
+    font-size: 14px;
+    /* font-weight: bold; */
+}

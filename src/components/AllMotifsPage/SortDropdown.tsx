@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 interface SortDropdownProps {
+    itemType: "motifs" | "structs";
     isOpen: boolean;
     toggleDropdown: () => void;
     selectedSort: string;
@@ -9,7 +10,7 @@ interface SortDropdownProps {
     setSortOrder: (order: "asc" | "desc") => void;
 }
 
-const sortOptions = [
+const sortOptionsMotifs = [
     "ID",
     "Number of Occurrences",
     "Number of Families",
@@ -19,7 +20,10 @@ const sortOptions = [
     "Number of Loops",
 ];
 
+const sortOptionsStructs = ["Length", "Number of Motifs", "Number of Loops"];
+
 const SortDropdown: React.FC<SortDropdownProps> = ({
+    itemType,
     isOpen,
     toggleDropdown,
     selectedSort,
@@ -44,6 +48,9 @@ const SortDropdown: React.FC<SortDropdownProps> = ({
     const handleSortOrderChange = (order: "asc" | "desc") => {
         setTempSortOrder(order);
     };
+
+    const sortOptions =
+        itemType === "motifs" ? sortOptionsMotifs : sortOptionsStructs;
 
     // Handle click outside the dropdown to close it
     useEffect(() => {

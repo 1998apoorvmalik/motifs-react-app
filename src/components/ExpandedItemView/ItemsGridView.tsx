@@ -1,52 +1,66 @@
 import React, { useState, useEffect } from "react";
-import Structure from "./../../interfaces/Structure";
-import { motifService } from "./../../services/motifService";
-import StructureItem from "./StructureItem";
-import Pagination from "./../Pagination";
+import Structure from "../../interfaces/Structure";
+// import { motifService } from "./../../services/motifService";
+// import StructureItem from "../StructureItem";
+import Pagination from "../Pagination";
 import ItemsPerPage from "../ItemsPerPage";
+import { structureService } from "../../services/structureService";
+import MotifItem from "../GridItem";
+import Motif from "../../interfaces/Motif";
+import { motifService } from "../../services/motifService";
 
 interface GridProps {
-    structureIDs: string[];
+    itemType: "motif" | "struc";
+    itemIDs: Record<string, string[]>;
     currentPage: number;
     itemsPerPage: number;
     setCurrentPage: (page: number) => void;
     setItemsPerPage: (itemsPerPage: number) => void;
-    handleViewClick: (structure: Structure) => void; // Add onViewClick prop
+    handleViewClick: (item: Motif | Structure) => void; // Add onViewClick prop
 }
 
-const StructuresGridView: React.FC<GridProps> = ({
-    structureIDs,
+const ItemsGridView: React.FC<GridProps> = ({
+    itemType,
+    itemIDs,
     currentPage,
     itemsPerPage,
     setCurrentPage,
     setItemsPerPage,
     handleViewClick,
 }) => {
-    const [structures, setStructures] = useState<Structure[]>([]);
+    const [items, setItems] = useState<Motif[] | Structure[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
     // Calculate the total number of pages
-    const totalPages = Math.ceil(structureIDs.length / itemsPerPage);
+    const totalPages = Math.ceil(Object.keys(itemIDs).length / itemsPerPage);
 
     // Get the items for the current page
-    const paginatedStructureIDs = structureIDs.slice(
+    const paginatedItemIDs = Object.keys(itemIDs).slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
 
-    // Fetch the structures
+    // Fetch the items
     useEffect(() => {
         const fetchStructures = async () => {
             setLoading(true);
             setError(null);
             try {
-                const data = await Promise.all(
-                    paginatedStructureIDs.map((id) =>
-                        motifService.getStructure(id)
-                    )
-                );
-                setStructures(data);
+                let data: Motif[] | Structure[] = [];
+                if (itemType === "motif") {
+                    data = await Promise.all(
+                        paginatedItemIDs.map((id) => motifService.getMotif(id))
+                    );
+                } else {
+                    data = await Promise.all(
+                        paginatedItemIDs.map((id) =>
+                            structureService.getStructure(id, itemIDs[id])
+                        )
+                    );
+                }
+
+                setItems(data);
             } catch (err) {
                 setError(
                     err instanceof Error
@@ -95,17 +109,20 @@ const StructuresGridView: React.FC<GridProps> = ({
 
             {/* Display structures in a grid */}
             <div className="grid-container">
-                {structures.map((item, index) => (
-                    <StructureItem
-                        item={item}
-                        index={(currentPage - 1) * itemsPerPage + index}
-                        key={item.id}
-                        onViewClick={() => handleViewClick(item)} // Pass click handler to trigger navigation
-                    />
-                ))}
+                {items.map((item) => {
+                    // console.log(item);
+                    return (
+                        <MotifItem
+                            key={item.id}
+                            item={item}
+                            // index={(currentPage - 1) * itemsPerPage + index}
+                            onViewClick={() => handleViewClick(item)} // Pass click handler to trigger navigation
+                        />
+                    );
+                })}
             </div>
         </div>
     );
 };
 
-export default StructuresGridView;
+export default ItemsGridView;

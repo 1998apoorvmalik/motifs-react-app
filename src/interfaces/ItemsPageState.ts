@@ -1,6 +1,6 @@
 import Motif from "./Motif";
 
-export interface MotifPageState {
+export interface ItemsPageState {
     viewMode: "grid" | "list"; // The current view mode for displaying motifs
     currentPage: number; // The current page number
     itemsPerPage: number; // The number of items per page
@@ -10,7 +10,7 @@ export interface MotifPageState {
     sortOrder: "asc" | "desc"; // The order of sorting
 }
 
-export interface ExpandedMotifPageState {
+export interface ExpandedItemPageState {
     motif: Motif; // The current motif being viewed
     currentPage: number; // The current page number
     itemsPerPage: number; // The number of items per page

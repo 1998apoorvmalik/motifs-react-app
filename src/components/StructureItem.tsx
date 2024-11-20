@@ -1,23 +1,26 @@
+// src/components/StructureItem.tsx
 import React, { useState } from "react";
-import Motif from "../interfaces/Motif";
-import CopyableTextBlock from "./CopyableTextBlock";
+import Structure from "../interfaces/Structure";
 import SvgViewer from "./SvgViewer";
+import CopyableTextBlock from "./CopyableTextBlock";
 
-interface MotifItemProps {
-    item: Motif;
+interface StructureItemProps {
+    item: Structure;
     height?: string;
     resizable?: boolean;
-    onViewClick?: () => void;
+
+    onViewClick?: () => void; // New prop to handle the click event
 }
 
-const MotifItem: React.FC<MotifItemProps> = ({
+const StructureItem: React.FC<StructureItemProps> = ({
     item,
     height,
     resizable,
     onViewClick,
 }) => {
     const [openInNewTab, setOpenInNewTab] = useState(false);
-    const motifUrl = `${process.env.REACT_APP_BASENAME}/motif/${item.id}`;
+
+    const strucUrl = `${process.env.REACT_APP_BASENAME}/struc/${item.id}`;
 
     const handleClick = (event: React.MouseEvent) => {
         if (onViewClick && !openInNewTab) {
@@ -29,7 +32,7 @@ const MotifItem: React.FC<MotifItemProps> = ({
     return (
         <div className="grid-item">
             <div className="motif-item-title">
-                <h2 style={{ margin: 0 }}>Motif ID: {item.id}</h2>
+                <h2 style={{ margin: 0 }}>Structure ID: {item.id}</h2>
 
                 <span className="info-icon">
                     <i
@@ -41,24 +44,21 @@ const MotifItem: React.FC<MotifItemProps> = ({
                     </span>
                 </span>
             </div>
-            <br />
-            <strong className="p-nomargin">Families:</strong>
-            <p className="p-nomargin">
-                {Object.entries(item.families).length > 0
-                    ? Object.entries(item.families)
-                          .map(([family, count]) => `${family} (${count})`)
-                          .join(", ")
-                    : "None"}
-            </p>
-            <br />
 
+            <h3>{item.names[0]}</h3>
+
+            <div className="inline-container">
+                <strong style={{ marginRight: "4px" }}>Family:</strong>
+                <p className="p-nomargin">{item.family}</p>
+            </div>
+            <br />
             <SvgViewer
-                svgXML={item.svg}
+                svgXML={item.svgContent[0]}
                 resetToolOnMouseLeave={true}
                 height={height || "300px"}
                 resizable={resizable || false}
                 showDownloadButton={true}
-            />
+            ></SvgViewer>
 
             {onViewClick && (
                 <div
@@ -74,32 +74,30 @@ const MotifItem: React.FC<MotifItemProps> = ({
                         Open in New Tab
                     </label>
                     <a
-                        href={motifUrl}
+                        href={strucUrl}
                         target={openInNewTab ? "_blank" : "_self"}
                         rel={openInNewTab ? "noopener noreferrer" : ""}
                     >
                         <button className="expand-button" onClick={handleClick}>
-                            View Motif
+                            View Structure
                         </button>
                     </a>
                 </div>
             )}
 
             <p>
-                Number of Occurrences: {item.numOccurences} <br />
-                Number of Families: {Object.keys(item.families).length} <br />
+                Number of Motifs: {item.motifsID.length} <br />
                 Length: {item.length} <br />
-                Boundary Pairs: {item.bpairs.length} <br />
-                Internal Pairs: {item.ipairs.length} <br />
-                Number of Loops: {item.loops}
+                Number of Pairs: {item.numPairs} <br />
+                Number of Loops: {item.numLoops}
             </p>
 
             <CopyableTextBlock
-                text={item.dotBracket?.[0] || ""}
+                text={item.dotBracket || ""}
                 label="Dot-Bracket Structure"
             />
         </div>
     );
 };
 
-export default MotifItem;
+export default StructureItem;
