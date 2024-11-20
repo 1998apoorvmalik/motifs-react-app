@@ -3,6 +3,21 @@ import { INITIAL_VALUE, ReactSVGPanZoom, TOOL_NONE } from "react-svg-pan-zoom";
 import { ReactSvgPanZoomLoader } from "react-svg-pan-zoom-loader";
 import { debounce } from "lodash";
 
+const extractSvgDimensions = (svgXML) => {
+  // Regular expression to match the viewBox attribute
+  const viewBoxMatch = svgXML.match(/viewBox\s*=\s*"([\d.\s-]+)"/);
+
+  if (viewBoxMatch) {
+    const viewBoxValues = viewBoxMatch[1].split(" ").map(parseFloat);
+    if (viewBoxValues.length === 4) {
+      const [, , width, height] = viewBoxValues; // Extract width and height
+      return { width, height };
+    }
+  }
+
+  return { width: 0, height: 0 }; // Default if no viewBox is found
+};
+
 function SvgViewer({
   svgXML,
   showMiniature = false,
@@ -20,19 +35,30 @@ function SvgViewer({
     tool: TOOL_NONE,
     position: alwaysShowToolbar ? toolbarPosition : "none",
   });
+
   const [svgContainerSize, setSvgContainerSize] = useState({
-    width: 250,
-    height: 250,
+    width: 1000,
+    height: 1000,
   });
 
-  // dynamically update the size of the container
+  const [svgWidth, setSVGWidth] = useState(0);
+  const [svgHeight, setSVGHeight] = useState(0);
+
+  // Extract dimensions from SVG XML when svgXML changes
   useEffect(() => {
-    // debounced function to update the size of the SVG container
+    const { width, height } = extractSvgDimensions(svgXML);
+    setSVGWidth(width);
+    setSVGHeight(height);
+
+    // fitToViewer(value, svgWidth, svgHeight);
+    
+  }, [svgXML]);
+
+  // Dynamically update the size of the container
+  useEffect(() => {
     const updateSvgSize = debounce(() => {
       if (containerRef.current) {
         const { clientWidth, clientHeight } = containerRef.current;
-
-        // console.log("Updating container size:", clientWidth, clientHeight);
 
         if (clientWidth && !isNaN(clientWidth)) {
           setSvgContainerSize({
@@ -43,14 +69,15 @@ function SvgViewer({
       }
     }, 250); // 250ms debounce
 
-    const resizeObserver = new ResizeObserver(() => updateSvgSize()); // update size on svg container resize
-    resizeObserver.observe(containerRef.current); // observe the svg container
-    return () => {
-      resizeObserver.disconnect(); // clean up the observer on component unmount
-    };
-  }, []); // run only on mount
+    const resizeObserver = new ResizeObserver(() => updateSvgSize());
+    resizeObserver.observe(containerRef.current);
 
-  // handler for mouse enter and leave
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
+  // Handler for mouse enter and leave
   const handleMouseEnter = () => {
     setToolbarOptions({
       tool: resetToolOnMouseLeave ? TOOL_NONE : toolbarOptions.tool,
@@ -64,7 +91,7 @@ function SvgViewer({
     });
   };
 
-  // function to download the SVG
+  // Function to download the SVG
   const handleDownload = () => {
     const blob = new Blob([svgXML], { type: "image/svg+xml" });
     const url = URL.createObjectURL(blob);
@@ -75,11 +102,11 @@ function SvgViewer({
     document.body.appendChild(link);
     link.click();
 
-    // clean up the link
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
 
+  console.log("Extracted SVG Dimensions:", { svgWidth, svgHeight });
   return (
     <div
       className="svg-container"
@@ -94,41 +121,41 @@ function SvgViewer({
     >
       <ReactSvgPanZoomLoader
         svgXML={svgXML}
-        render={(content) => {
-          return (
-            <ReactSVGPanZoom
-              width={svgContainerSize.width} // Dynamic width
-              height={svgContainerSize.height} // Dynamic height
-              tool={toolbarOptions.tool}
-              onChangeTool={(tool) =>
-                setToolbarOptions({ tool, position: toolbarOptions.position })
-              }
-              value={value}
-              onChangeValue={setValue}
-              detectAutoPan={false}
-              detectWheel={toolbarOptions.tool !== TOOL_NONE}
-              background="white"
-              miniatureProps={{ position: showMiniature ? "left" : "none" }}
-              toolbarProps={{
-                position: toolbarOptions.position,
-                // SVGAlignX: "center",
-                // SVGAlignY: "center",
-              }}
+        render={(content) => (
+          <ReactSVGPanZoom
+            width={svgContainerSize.width}
+            height={svgContainerSize.height}
+            tool={toolbarOptions.tool}
+            onChangeTool={(tool) =>
+              setToolbarOptions({ tool, position: toolbarOptions.position })
+            }
+            value={value}
+            onChangeValue={setValue}
+            detectAutoPan={false}
+            detectWheel={toolbarOptions.tool !== TOOL_NONE}
+            background="white"
+            miniatureProps={{ position: showMiniature ? "left" : "none" }}
+            toolbarProps={{
+              position: toolbarOptions.position,
+            }}
+          >
+            <svg
+              width={svgWidth}
+              height={svgHeight}
             >
-              <svg
-                width={svgContainerSize.width}
-                height={svgContainerSize.height}
-              >
-                {content}
-              </svg>
-            </ReactSVGPanZoom>
-          );
-        }}
+              {content}
+            </svg>
+          </ReactSVGPanZoom>
+        )}
       />
 
       {showDownloadButton && (
-        <button className="svg-download-button" title="Download SVG" onClick={handleDownload}>
-          <i className="fas fa-download"></i> {/* Font Awesome Download Icon */}
+        <button
+          className="svg-download-button"
+          title="Download SVG"
+          onClick={handleDownload}
+        >
+          <i className="fas fa-download"></i>
         </button>
       )}
       {resizable && (
