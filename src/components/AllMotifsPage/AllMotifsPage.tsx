@@ -19,6 +19,7 @@ import Structure from "../../interfaces/Structure";
 import { structureService } from "../../services/structureService";
 import MotifListItem from "./MotifListItem";
 import StructureListItem from "./StructureListItem";
+import { familyMapping } from "../../constants/familyMapping";
 
 const AllMotifsPage: React.FC = () => {
     const location = useLocation();
@@ -34,13 +35,14 @@ const AllMotifsPage: React.FC = () => {
     const initialSearchQuery = restoredItemsPageState.searchQuery || "";
     const initialSelectedFilters =
         restoredItemsPageState.selectedFilters ||
-        (itemType === "motifs" ? [] : ["eterna"]);
+        (itemType === "motifs"
+            ? familyMapping.map((item) => item.value)
+            : ["eterna"]);
     const initialSelectedSort =
         restoredItemsPageState.selectedSort ||
         (itemType === "motifs" ? "Number of Families" : "Number of Motifs");
     const initialSortOrder = restoredItemsPageState.sortOrder || "desc";
 
-    const [didFilterChange, setDidFilterChange] = useState(false);
     const [selectedFilters, setSelectedFilters] = useState<string[]>(
         initialSelectedFilters
     );
@@ -230,10 +232,11 @@ const AllMotifsPage: React.FC = () => {
         const newType = itemType === "motifs" ? "structs" : "motifs";
         setLoadingMotifs(true);
         setItemType(newType);
-        if (!didFilterChange) {
-            setSelectedFilters(itemType === "motifs" ? ["eterna"] : []);
-        }
-
+        setSelectedFilters(
+            itemType === "motifs"
+                ? ["eterna"]
+                : familyMapping.map((item) => item.value)
+        );
         setSelectedSort(
             newType === "motifs" ? "Number of Families" : "Number of Motifs"
         );
@@ -420,11 +423,7 @@ const AllMotifsPage: React.FC = () => {
 
                     <FamilyFilterDropdown
                         selectedFilters={selectedFilters}
-                        setSelectedFilters={(filters) => {
-                            console.log("Selected filters:", filters);
-                            setDidFilterChange(true);
-                            setSelectedFilters(filters);
-                        }}
+                        setSelectedFilters={setSelectedFilters}
                     />
                 </div>
 
