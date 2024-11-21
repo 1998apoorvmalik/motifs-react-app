@@ -10,7 +10,6 @@ import FamilyFilterDropdown from "../FamilyFilterDropdown";
 import SortDropdown from "./SortDropdown";
 import Pagination from "../Pagination";
 import ItemsPerPage from "../ItemsPerPage";
-import MotifListItem from "./MotifListItem";
 import MotifItem from "../GridItem";
 import NewStructureInput from "./../NewStructureInput";
 import LoadingSpinner from "../LoadingSpinnner";
@@ -18,7 +17,6 @@ import FindNewMotifsProgress from "./FindNewMotifsProgress";
 import ToggleSwitch from "../ToggleSwitch/ToggleSwitch";
 import Structure from "../../interfaces/Structure";
 import { structureService } from "../../services/structureService";
-import StructureItem from "../StructureItem";
 
 const AllMotifsPage: React.FC = () => {
     const location = useLocation();
@@ -32,25 +30,26 @@ const AllMotifsPage: React.FC = () => {
     const initialCurrentPage = restoredItemsPageState.currentPage || 1;
     const initialItemsPerPage = restoredItemsPageState.itemsPerPage || 30;
     const initialSearchQuery = restoredItemsPageState.searchQuery || "";
-    const initialSelectedFilters = restoredItemsPageState.selectedFilters || [];
+    const initialSelectedFilters =
+        restoredItemsPageState.selectedFilters ||
+        (itemType === "motifs" ? [] : ["eterna"]);
     const initialSelectedSort =
         restoredItemsPageState.selectedSort ||
         (itemType === "motifs" ? "Number of Families" : "Number of Motifs");
     const initialSortOrder = restoredItemsPageState.sortOrder || "desc";
 
-    const [isFilterOpen, setFilterOpen] = useState(false);
-    const [isSortOpen, setSortOpen] = useState(false);
-
+    const [didFilterChange, setDidFilterChange] = useState(false);
     const [selectedFilters, setSelectedFilters] = useState<string[]>(
         initialSelectedFilters
     );
+
+    const [isSortOpen, setSortOpen] = useState(false);
     const [selectedSort, setSelectedSort] =
         useState<string>(initialSelectedSort);
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">(
         initialSortOrder
     );
 
-    const toggleFilterDropdown = () => setFilterOpen(!isFilterOpen);
     const toggleSortDropdown = () => setSortOpen(!isSortOpen);
 
     const [viewMode, setViewMode] = useState<"grid" | "list">(initialViewMode);
@@ -225,12 +224,28 @@ const AllMotifsPage: React.FC = () => {
         }
     };
 
+    const handleServerToggle = () => {
+        const newType = itemType === "motifs" ? "structs" : "motifs";
+        setLoadingMotifs(true);
+        setItemType(newType);
+        if (!didFilterChange) {
+            setSelectedFilters(itemType === "motifs" ? ["eterna"] : []);
+        }
+
+        setSelectedSort(
+            newType === "motifs" ? "Number of Families" : "Number of Motifs"
+        );
+        setItemsPerPage(newType === "motifs" ? 30 : 5);
+    };
+
     // Render loading, error, or the grid of motifs
     if (loadingMotifs) {
         return (
             <LoadingSpinner
                 message={`Loading ${
-                    itemType === "motifs" ? "Motifs" : "Structures"
+                    itemType === "motifs"
+                        ? "Motifs"
+                        : "Structures (might take about 30 seconds)"
                 }...`}
             />
         );
@@ -303,97 +318,120 @@ const AllMotifsPage: React.FC = () => {
 
     return (
         <div>
-            <h1 style={{ textAlign: "center" }}>FastMotif</h1>
-            <p style={{ textAlign: "center", fontSize: "20px" }}>
+            <h1 style={{ textAlign: "center", marginBottom: "0px" }}>
+                FastMotif
+            </h1>
+            <p
+                style={{
+                    textAlign: "center",
+                    fontSize: "20px",
+                    marginTop: "2px",
+                }}
+            >
                 Scalable and Interpretable Identification of Minimal
                 Undesignable RNA Structure Motifs with Rotational Invariance
+                <br />
+                <a href="https://github.com/shanry/RNA-Undesign/">
+                    <i
+                        className="fab fa-github"
+                        style={{ marginRight: "8px" }}
+                    ></i>
+                    https://github.com/shanry/RNA-Undesign/
+                </a>
             </p>
-            <ToggleSwitch
-                leftLabel="Motifs"
-                rightLabel="Structures"
-                isLeft={itemType === "motifs"}
-                onToggle={() => {
-                    const newType =
-                        itemType === "motifs" ? "structs" : "motifs";
-                    setLoadingMotifs(true);
-                    setItemType(newType);
-                    setSelectedSort(
-                        newType === "motifs"
-                            ? "Number of Families"
-                            : "Number of Motifs"
-                    );
-                    setItemsPerPage(newType === "motifs" ? 30 : 5);
-                }}
-            />
-            {/* <div style={{ display: "flex", justifyContent: "end", alignItems: "center" }}> */}
-            <a href="https://github.com/shanry/RNA-Undesign/">
-                <i className="fab fa-github" style={{ marginRight: "8px" }}></i>
-                https://github.com/shanry/RNA-Undesign/
-            </a>
-            {/* </div> */}
-            <div className="container">
-                <div className="header-bar">
-                    <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={setCurrentPage}
-                    />
 
-                    <div className="header-section">
-                        <div>
-                            <button
-                                className="new-structure-button"
-                                onClick={handleNewButtonClick}
-                            >
-                                Input Structure
-                            </button>
+            <div className="border">
+                <div
+                    className="inline-container border"
+                    style={{
+                        justifyContent: "space-between",
+                        alignItems: "flex-end",
+                        marginBottom: "0px",
+                        borderWidth: "0px 0px 1px 0px",
+                        height: "82px",
+                    }}
+                >
+                    <button
+                        className="new-structure-button"
+                        onClick={handleNewButtonClick}
+                    >
+                        Input New Structure <br /> (Find Undesignable Motifs)
+                    </button>
 
-                            <NewStructureInput
-                                placeholder="Enter dot-bracket structure"
-                                onInputSubmit={handleDialogSubmit}
-                                isVisible={isDialogVisible}
-                                onClose={handleCloseDialog}
-                            />
-                        </div>
-                        <SearchBar
-                            searchQuery={searchQuery}
-                            onSearchQueryChange={(e) => {
-                                console.log("Search query changed:", e);
-                                return setSearchQuery(e);
-                            }}
+                    <div
+                        className="border"
+                        style={{
+                            display: "flex",
+                            minWidth: "300px",
+                            width: "30%",
+                            backgroundColor: "#ccc",
+                            borderWidth: "0px 1px 0px 0px",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            height: "100%",
+                        }}
+                    >
+                        <ToggleSwitch
+                            leftLabel="Motifs View"
+                            rightLabel="Structures View"
+                            isLeft={itemType === "motifs"}
+                            onToggle={handleServerToggle}
                         />
-                        <div className="view-toggle">
-                            <button
-                                className={`view-button ${
-                                    viewMode === "grid" ? "active" : ""
-                                }`}
-                                onClick={() => setViewMode("grid")}
-                            >
-                                <i className="fas fa-th-large"></i> Icon View
-                            </button>
-                            <button
-                                className={`view-button ${
-                                    viewMode === "list" ? "active" : ""
-                                }`}
-                                onClick={() => setViewMode("list")}
-                            >
-                                <i className="fas fa-list"></i> List View
-                            </button>
-                        </div>
                     </div>
 
-                    <div className="centered-container">
-                        <div
-                            className="centered-container"
-                            style={{ gap: "0px" }}
-                        >
-                            <FamilyFilterDropdown
-                                isOpen={isFilterOpen}
-                                toggleDropdown={toggleFilterDropdown}
-                                selectedFilters={selectedFilters}
-                                setSelectedFilters={setSelectedFilters}
-                            />
+                    <FamilyFilterDropdown
+                        selectedFilters={selectedFilters}
+                        setSelectedFilters={(filters) => {
+                            console.log("Selected filters:", filters);
+                            setDidFilterChange(true);
+                            setSelectedFilters(filters);
+                        }}
+                    />
+                </div>
 
+                <div className="container">
+                    <div className="header-bar">
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={setCurrentPage}
+                        />
+
+                        <div className="header-section">
+                            <div>
+                                <NewStructureInput
+                                    placeholder="Enter dot-bracket structure"
+                                    onInputSubmit={handleDialogSubmit}
+                                    isVisible={isDialogVisible}
+                                    onClose={handleCloseDialog}
+                                />
+                            </div>
+                            <div className="view-toggle">
+                                <button
+                                    className={`view-button ${
+                                        viewMode === "grid" ? "active" : ""
+                                    }`}
+                                    onClick={() => setViewMode("grid")}
+                                >
+                                    <i className="fas fa-th-large"></i> Icon
+                                    View
+                                </button>
+                                <button
+                                    className={`view-button ${
+                                        viewMode === "list" ? "active" : ""
+                                    }`}
+                                    onClick={() => setViewMode("list")}
+                                >
+                                    <i className="fas fa-list"></i> List View
+                                </button>
+                            </div>
+                            <SearchBar
+                                searchQuery={searchQuery}
+                                onSearchQueryChange={(e) => {
+                                    console.log("Search query changed:", e);
+                                    return setSearchQuery(e);
+                                }}
+                            />
                             <SortDropdown
                                 itemType={itemType}
                                 isOpen={isSortOpen}
@@ -404,18 +442,28 @@ const AllMotifsPage: React.FC = () => {
                                 setSortOrder={setSortOrder}
                             />
                         </div>
-                        <div
-                            className="center"
-                            style={{ marginLeft: "8px", marginRight: "16px" }}
-                        >
-                            <ItemsPerPage
-                                itemsPerPage={itemsPerPage}
-                                onItemsPerPageChange={setItemsPerPage}
-                            />
+
+                        <div className="centered-container">
+                            {/* <div
+                                className="centered-container"
+                                style={{ gap: "0px" }}
+                            ></div> */}
+                            <div
+                                className="center"
+                                style={{
+                                    marginLeft: "8px",
+                                    marginRight: "16px",
+                                }}
+                            >
+                                <ItemsPerPage
+                                    itemsPerPage={itemsPerPage}
+                                    onItemsPerPageChange={setItemsPerPage}
+                                />
+                            </div>
                         </div>
                     </div>
+                    {renderItems()}
                 </div>
-                {renderItems()}
             </div>
         </div>
     );

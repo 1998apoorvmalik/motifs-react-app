@@ -29,7 +29,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
             }}
             onBlur={handleInputCommit} // Trigger search when input loses focus
             className="search-bar"
-            style={{ width: "200px", marginRight: "24px" }}
+            style={{ width: "240px", marginRight: "24px" }}
         />
     );
 };

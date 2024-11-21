@@ -76,6 +76,7 @@ const ExpandedStructureView: React.FC = () => {
             {/* SVG Viewer for displaying the structure */}
             <SvgViewer
                 svgXML={structure.svgContent}
+                type="struc"
                 showMiniature={true}
                 alwaysShowToolbar={true}
                 toolbarPosition="left"

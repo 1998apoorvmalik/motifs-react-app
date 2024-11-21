@@ -12,6 +12,7 @@ import SvgViewer from "../SvgViewer";
 import CopyableTextBlock from "../CopyableTextBlock";
 import { motifService } from "../../services/motifService"; // Import the service to fetch motifs
 import { structureService } from "../../services/structureService";
+import RNAName from "../RNAName";
 
 function processStructureIDs(structureIDs: string[]): Record<string, string[]> {
     return structureIDs.reduce<Record<string, string[]>>((acc, id) => {
@@ -89,7 +90,7 @@ const ExpandedItemView: React.FC = () => {
 
     useEffect(() => {
         const itemID = location.pathname.split("/").pop(); // Extract the item ID from the URL
-        const isMotif = !itemID?.includes("ref"); // Determine if it's a motif or structure
+        const isMotif = !itemID?.includes("_"); // Determine if it's a motif or structure
 
         if (itemID) {
             const fetchItem = async () => {
@@ -146,19 +147,28 @@ const ExpandedItemView: React.FC = () => {
 
     return (
         <div>
-            {location.state?.motif && (
-                <button
-                    className="back-button"
-                    onClick={handleBackClick}
-                    style={{ marginTop: "16px" }}
-                >
-                    {"< Back to All Motifs Page"}
-                </button>
+            {/* {location.state?.motif && ( */} {/* [TODO] FIX THIS*/}
+            {true && (
+                <>
+                    <button
+                        className="back-button"
+                        onClick={handleBackClick}
+                        style={{ marginTop: "16px" }}
+                    >
+                        {"< Back to All Items Page"}
+                    </button>
+                    <br />
+                    <br />
+                </>
             )}
-            <h1>
-                {isMotif(item) ? "Motif ID: " : ""}
-                {isMotif(item) ? item.id : item.names[0]}
-            </h1>
+            {isMotif(item) ? (
+                <h2 className="grid-item-title" style={{ fontSize: "28px" }}>
+                    Motif ID: {item.id}
+                </h2>
+            ) : (
+                <RNAName names={item.names} bigTitle={true} />
+            )}
+            <br />
             {/* Families */}
             {isMotif(item) && (
                 <>
@@ -182,17 +192,16 @@ const ExpandedItemView: React.FC = () => {
                     <p className="p-nomargin">{item.family}</p>
                 </div>
             )}
-
             {!isMotif(item) && (
                 <span>(Structure ID: {item.id || "Unnamed Structure"})</span>
             )}
-
             <SvgViewer
                 svgXML={
                     isMotif(item)
                         ? item.svg
                         : item.svgContent?.[currentSvgIndex] || ""
                 }
+                type={isMotif(item) ? "motif" : "struc"}
                 showMiniature={true}
                 alwaysShowToolbar={true}
                 toolbarPosition="left"
@@ -209,7 +218,6 @@ const ExpandedItemView: React.FC = () => {
                 Internal Pairs: {item.ipairs.length} <br />
                 Number of Loops: {item.numLoops}
             </p> */}
-
             {/* Navigation for multiple SVGs */}
             {!isMotif(item) && item.svgContent && (
                 <div className="svg-navigation">
@@ -249,8 +257,11 @@ const ExpandedItemView: React.FC = () => {
                     </>
                 ) : (
                     <>
-                        Number of Motifs: {item.motifsID.length} <br />
-                        Number of Pairs: {item.numPairs} <br />
+                        Number of Pairs: {item.numPairs}
+                        <br />
+                        Min. Unique Undesignable Motifs: {
+                            item.motifsID.length
+                        }{" "}
                     </>
                 )}
             </p>
@@ -272,7 +283,7 @@ const ExpandedItemView: React.FC = () => {
             >
                 {isMotif(item)
                     ? "Structures Containing the Motif"
-                    : "Motifs in the Structure"}
+                    : "Minimal Unique Undesignable Motifs in this Structure"}
             </h2>
             {/* Display the structures using the grid */}
             <ItemsGridView

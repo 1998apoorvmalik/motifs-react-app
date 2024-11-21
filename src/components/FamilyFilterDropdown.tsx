@@ -1,24 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { familyMapping } from "../constants/familyMapping";
 
-interface FamilyFilterDropdownProps {
-    isOpen: boolean;
-    toggleDropdown: () => void;
+interface FamilyFilterProps {
     selectedFilters: string[];
     setSelectedFilters: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const filterOptions = familyMapping;
 
-const FamilyFilterDropdown: React.FC<FamilyFilterDropdownProps> = ({
-    isOpen,
-    toggleDropdown,
+const FamilyFilter: React.FC<FamilyFilterProps> = ({
     selectedFilters,
     setSelectedFilters,
 }) => {
-    const dropdownRef = useRef<HTMLDivElement>(null);
-
-    // Temporary filters state for when the dropdown is open
     const [tempFilters, setTempFilters] = useState<string[]>(selectedFilters);
 
     const handleFilterChange = (filterValue: string) => {
@@ -31,77 +24,53 @@ const FamilyFilterDropdown: React.FC<FamilyFilterDropdownProps> = ({
         });
     };
 
-    // Handle click outside the dropdown to close it
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (
-                dropdownRef.current &&
-                !dropdownRef.current.contains(event.target as Node)
-            ) {
-                toggleDropdown();
-                setTempFilters(selectedFilters);
-            }
-        };
-
-        if (isOpen) {
-            document.addEventListener("mousedown", handleClickOutside);
-        } else {
-            document.removeEventListener("mousedown", handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [isOpen, toggleDropdown, selectedFilters]);
-
-    // Apply selected filters to the main state
     const applyFilters = () => {
         setSelectedFilters(tempFilters);
-        toggleDropdown();
     };
 
-    // Reset the selected filters
     const resetFilters = () => {
-        setTempFilters([]);
+        // setTempFilters([]);
+        setSelectedFilters([]);
     };
 
     return (
-        <div ref={dropdownRef} className="dropdown">
-            <button
-                className={`header-button ${isOpen ? "active" : ""}`}
-                onClick={toggleDropdown}
+        <div className="filter-container">
+            {/* Render all filter options horizontally */}
+            <div
+                className="inline-container"
+                style={{ justifyContent: "space-between" }}
             >
-                Filter
-            </button>
-            {isOpen && (
-                <div className="dropdown-menu">
-                    {filterOptions.map((option) => (
-                        <div key={option.value} className="dropdown-item">
-                            <label className="dropdown-label">
-                                <input
-                                    type="checkbox"
-                                    checked={tempFilters.includes(option.value)}
-                                    onChange={() =>
-                                        handleFilterChange(option.value)
-                                    }
-                                />
-                                {option.display}
-                            </label>
-                        </div>
-                    ))}
-                    {/* Apply and Reset buttons */}
-                    <div className="dropdown-actions">
-                        <button onClick={applyFilters} className="apply-button">
-                            Apply
-                        </button>
-                        <button onClick={resetFilters} className="reset-button">
-                            Reset
-                        </button>
-                    </div>
+                <div></div>
+                <h3 style={{ margin: "0px" }}>Family Filter</h3>
+                <div className="filter-actions">
+                    <button onClick={applyFilters} className="apply-button">
+                        Apply
+                    </button>
+                    <button onClick={resetFilters} className="reset-button">
+                        Reset
+                    </button>
                 </div>
-            )}
+            </div>
+            <div className="filter-options">
+                {filterOptions.map((option) => (
+                    <div key={option.value} className="filter-item">
+                        <label className="filter-label">
+                            <input
+                                type="checkbox"
+                                style={{ marginLeft: 0, marginRight: 0 }}
+                                checked={tempFilters.includes(option.value)}
+                                onChange={() =>
+                                    handleFilterChange(option.value)
+                                }
+                            />
+                            {option.display}
+                        </label>
+                    </div>
+                ))}
+            </div>
+            {/* Apply and Reset buttons */}
         </div>
     );
 };
 
-export default FamilyFilterDropdown;
+export default FamilyFilter;

@@ -54,6 +54,7 @@ const StructureItem: React.FC<StructureItemProps> = ({
             <br />
             <SvgViewer
                 svgXML={item.svgContent[0]}
+                type="struc"
                 resetToolOnMouseLeave={true}
                 height={height || "300px"}
                 resizable={resizable || false}

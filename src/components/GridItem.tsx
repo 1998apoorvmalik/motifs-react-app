@@ -4,6 +4,7 @@ import CopyableTextBlock from "./CopyableTextBlock";
 import Motif from "../interfaces/Motif";
 import Structure from "../interfaces/Structure";
 import "./GridItem.css";
+import RNAName from "./RNAName";
 
 interface GridItemProps {
     item: Motif | Structure;
@@ -25,7 +26,7 @@ const GridItem: React.FC<GridItemProps> = ({
 
     // Determine if the item is a Motif or a Structure
     const isMotif = (item: Motif | Structure): item is Motif =>
-        "numOccurences" in item;
+        item.type === "motif";
 
     const itemUrl = `${process.env.REACT_APP_BASENAME}/item/${item.id}`;
 
@@ -59,11 +60,12 @@ const GridItem: React.FC<GridItemProps> = ({
     return (
         <div className="grid-item">
             <div className="motif-item-title">
-                <h2 style={{ margin: 0 }}>
-                    {isMotif(item) ? "Motif ID: " : ""}
-                    {isMotif(item) ? item.id : item.names[0]}
-                </h2>
-                <span className="info-icon">
+                {isMotif(item) ? (
+                    <h2 className="grid-item-title">Motif ID: {item.id}</h2>
+                ) : (
+                    <RNAName names={item.names} />
+                )}
+                {/* <span className="info-icon">
                     <i
                         className="fas fa-info-circle"
                         style={{ fontSize: 20 }}
@@ -71,7 +73,7 @@ const GridItem: React.FC<GridItemProps> = ({
                     <span className="tooltip-text">
                         Additional info about this item
                     </span>
-                </span>
+                </span> */}
             </div>
 
             <br />
@@ -111,6 +113,7 @@ const GridItem: React.FC<GridItemProps> = ({
                         ? item.svg
                         : item.svgContent?.[currentSvgIndex] || ""
                 }
+                type={isMotif(item) ? "motif" : "struc"}
                 resetToolOnMouseLeave={true}
                 height={height || "300px"}
                 resizable={resizable || false}
@@ -151,14 +154,14 @@ const GridItem: React.FC<GridItemProps> = ({
                     className="centered-container"
                     style={{ marginTop: "8px", flexDirection: "column" }}
                 >
-                    <label className="checkbox-label">
+                    {/* <label className="checkbox-label">
                         <input
                             type="checkbox"
                             checked={openInNewTab}
                             onChange={() => setOpenInNewTab(!openInNewTab)}
                         />
                         Open in New Tab
-                    </label>
+                    </label> */}
                     <a
                         href={itemUrl}
                         target={openInNewTab ? "_blank" : "_self"}
@@ -172,6 +175,8 @@ const GridItem: React.FC<GridItemProps> = ({
             )}
 
             <p>
+                Length: {item.length} <br />
+                Number of Loops: {item.numLoops} <br />
                 {isMotif(item) ? (
                     <>
                         Number of Occurrences: {item.numOccurences} <br />
@@ -180,12 +185,12 @@ const GridItem: React.FC<GridItemProps> = ({
                     </>
                 ) : (
                     <>
-                        Number of Motifs: {item.motifsID.length} <br />
                         Number of Pairs: {item.numPairs} <br />
+                        Min. Unique Undesignable Motifs: {
+                            item.motifsID.length
+                        }{" "}
                     </>
                 )}
-                Length: {item.length} <br />
-                Number of Loops: {item.numLoops}
             </p>
 
             {/* Dot-Bracket Structure */}

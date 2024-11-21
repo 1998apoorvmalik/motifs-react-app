@@ -8,7 +8,7 @@
 }
 
 .nav-button {
-    background-color: #007bff;
+    background-color: #479f76;
     color: white;
     border: none;
     padding: 5px 10px;
@@ -19,11 +19,11 @@
 }
 
 .nav-button:hover {
-    background-color: #0056b3;
+    background-color: #198754;
 }
 
 .nav-button.disabled {
-    background-color: #d6d6d6;
+    background-color: #d1d1d1;
     cursor: not-allowed;
 }
 

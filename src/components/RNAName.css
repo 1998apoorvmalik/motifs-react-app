@@ -1,0 +1,85 @@
+/* Container for the RNAName component */
+.rna-name-container {
+    text-align: left;
+    overflow: hidden;
+}
+
+.selected-name {
+    overflow-x: auto; /* Enable horizontal scrolling */
+    white-space: nowrap; /* Prevent wrapping of text */
+    max-width: 100%; /* Limit the width to the parent container */
+    display: block; /* Ensure it's treated as a block element */
+}
+
+.selected-name::-webkit-scrollbar {
+    height: 1px; /* Adjust scrollbar height */
+}
+
+.selected-name::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 2px;
+}
+
+.selected-name::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
+}
+
+/* Text styling for expand/collapse toggle */
+.expand-toggle {
+    cursor: pointer;
+    color: #007bff;
+    font-size: 14px;
+    margin: 2px 0;
+    display: inline-flex;
+    align-items: center;
+    user-select: none; /* Prevents text selection */
+    gap: 5px;
+    transition: color 0.2s ease;
+}
+
+.expand-toggle:hover {
+    color: #0056b3;
+}
+
+/* Disabled toggle styling */
+.disabled-toggle {
+    cursor: not-allowed;
+    color: #aaa; /* Greyed-out text */
+}
+
+.disabled-toggle:hover {
+    color: #aaa; /* Prevent hover effect on disabled toggle */
+}
+
+/* Dropdown list styling */
+.dropdown-names {
+    list-style-type: none;
+    padding: 0;
+    margin: 8px 0 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    max-width: 400px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Individual dropdown name items */
+.dropdown-name-item {
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-name-item:hover {
+    background-color: #f5f5f5;
+    color: #007bff;
+}
+
+/* Highlight the currently selected item */
+.dropdown-name-item.selected {
+    font-weight: bold;
+    background-color: #e6f0ff;
+    color: #007bff;
+}
