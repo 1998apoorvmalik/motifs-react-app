@@ -237,7 +237,7 @@ const AllMotifsPage: React.FC = () => {
         setSelectedSort(
             newType === "motifs" ? "Number of Families" : "Number of Motifs"
         );
-        setItemsPerPage(newType === "motifs" ? 30 : 5);
+        setItemsPerPage(newType === "motifs" ? 30 : 20);
     };
 
     // Render loading, error, or the grid of motifs
