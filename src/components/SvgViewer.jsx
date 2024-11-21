@@ -6,7 +6,7 @@ import {
     fitToViewer,
 } from "react-svg-pan-zoom";
 import { ReactSvgPanZoomLoader } from "react-svg-pan-zoom-loader";
-import { debounce, set } from "lodash";
+import { debounce } from "lodash";
 
 const extractSvgDimensions = (svgXML) => {
     // Regular expression to match the viewBox attribute
