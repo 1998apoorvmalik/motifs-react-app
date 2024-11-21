@@ -63,7 +63,7 @@ const GridItem: React.FC<GridItemProps> = ({
                 {isMotif(item) ? (
                     <h2 className="grid-item-title">Motif ID: {item.id}</h2>
                 ) : (
-                    <RNAName names={item.names} />
+                    <RNAName name={item.name} names={item.names} />
                 )}
                 {/* <span className="info-icon">
                     <i
@@ -186,9 +186,8 @@ const GridItem: React.FC<GridItemProps> = ({
                 ) : (
                     <>
                         Number of Pairs: {item.numPairs} <br />
-                        Min. Unique Undesignable Motifs: {
-                            item.motifsID.length
-                        }{" "}
+                        Unique Minimal Undesignable Motifs:{" "}
+                        {item.motifsID.length}{" "}
                     </>
                 )}
             </p>

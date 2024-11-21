@@ -3,6 +3,7 @@
 export default interface Structure {
     type: "struc";
     id: string;
+    name: string;
     names: string[];
     family: string;
     dotBracket: string;
@@ -17,6 +18,7 @@ export function structureFromJson(data: any): Structure {
     return {
         type: "struc",
         id: data._id || "unknown",
+        name: data.name || "unknown",
         names: data.names || [],
         family: data.family || "unknown",
         dotBracket: data.dot_bracket || "",

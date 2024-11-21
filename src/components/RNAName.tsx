@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import "./RNAName.css";
 
 interface RNANameProps {
+    name: string;
     names: string[];
     bigTitle?: boolean;
 }
 
-const RNAName: React.FC<RNANameProps> = ({ names, bigTitle }) => {
-    const [selectedName, setSelectedName] = useState(names[0]);
+const RNAName: React.FC<RNANameProps> = ({ name, names, bigTitle }) => {
+    // const [selectedName, setSelectedName] = useState(names[0]);
     const [isExpanded, setIsExpanded] = useState(false);
 
     // Function to process a single name
@@ -38,11 +39,11 @@ const RNAName: React.FC<RNANameProps> = ({ names, bigTitle }) => {
         }
     };
 
-    // Handle clicking on a name
-    const handleNameClick = (name: string) => {
-        setSelectedName(name);
-        setIsExpanded(false);
-    };
+    // // Handle clicking on a name
+    // const handleNameClick = (name: string) => {
+    //     setSelectedName(name);
+    //     setIsExpanded(false);
+    // };
 
     return (
         <div className="rna-name-container">
@@ -51,7 +52,7 @@ const RNAName: React.FC<RNANameProps> = ({ names, bigTitle }) => {
                 className="grid-item-title"
                 style={bigTitle ? { fontSize: "28px" } : {}}
             >
-                <div className="selected-name">{processName(selectedName)}</div>
+                <div className="selected-name">{processName(name)}</div>
             </h2>
 
             {/* Expand/Collapse toggle */}
@@ -67,15 +68,15 @@ const RNAName: React.FC<RNANameProps> = ({ names, bigTitle }) => {
             {/* Dropdown list */}
             {isExpanded && names.length > 1 && (
                 <ul className="dropdown-names">
-                    {names.map((name) => (
+                    {names.map((other_name) => (
                         <li
-                            key={name}
+                            key={other_name}
                             className={`dropdown-name-item ${
-                                name === selectedName ? "selected" : ""
+                                other_name === name ? "selected" : ""
                             }`}
-                            onClick={() => handleNameClick(name)}
+                            // onClick={() => handleNameClick(name)}
                         >
-                            {processName(name)}
+                            {processName(other_name)}
                         </li>
                     ))}
                 </ul>

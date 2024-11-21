@@ -166,7 +166,7 @@ const ExpandedItemView: React.FC = () => {
                     Motif ID: {item.id}
                 </h2>
             ) : (
-                <RNAName names={item.names} bigTitle={true} />
+                <RNAName name={item.name} names={item.names} bigTitle={true} />
             )}
             <br />
             {/* Families */}
@@ -259,9 +259,8 @@ const ExpandedItemView: React.FC = () => {
                     <>
                         Number of Pairs: {item.numPairs}
                         <br />
-                        Min. Unique Undesignable Motifs: {
-                            item.motifsID.length
-                        }{" "}
+                        Unique Minimal Undesignable Motifs:{" "}
+                        {item.motifsID.length}{" "}
                     </>
                 )}
             </p>
@@ -283,7 +282,7 @@ const ExpandedItemView: React.FC = () => {
             >
                 {isMotif(item)
                     ? "Structures Containing the Undesignable Motif"
-                    : "Minimal Unique Undesignable Motifs in this Structure"}
+                    : "Unique Minimal Undesignable Motifs in this Structure"}
             </h2>
             {/* Display the structures using the grid */}
             <ItemsGridView

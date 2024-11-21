@@ -6,6 +6,7 @@ export const familyMapping = [
     { display: "SRP", value: "srp" },
     { display: "RNase P", value: "RNaseP" },
     { display: "tmRNA", value: "tmRNA" },
+    { display: "tRNA", value: "tRNA" },
     { display: "Group I", value: "grp1" },
     { display: "16S", value: "16s" },
     { display: "23S", value: "23s" },

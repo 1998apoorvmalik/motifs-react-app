@@ -108,7 +108,14 @@ const ItemsGridView: React.FC<GridProps> = ({
             </div>
 
             {/* Display structures in a grid */}
-            <div className="grid-container">
+            <div
+                className="grid-container"
+                style={{
+                    gridTemplateColumns: `repeat(auto-fill, minmax(${
+                        itemType === "motif" ? "400" : "800"
+                    }px, 1fr))`,
+                }}
+            >
                 {items.map((item) => {
                     // console.log(item);
                     return (
