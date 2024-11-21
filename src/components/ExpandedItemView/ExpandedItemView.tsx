@@ -282,7 +282,7 @@ const ExpandedItemView: React.FC = () => {
                 }}
             >
                 {isMotif(item)
-                    ? "Structures Containing the Motif"
+                    ? "Structures Containing the Undesignable Motif"
                     : "Minimal Unique Undesignable Motifs in this Structure"}
             </h2>
             {/* Display the structures using the grid */}
