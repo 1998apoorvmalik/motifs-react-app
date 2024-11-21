@@ -60,7 +60,7 @@ function SvgViewer({
 
         setTimeout(() => {
             setSvgFitted(true);
-        }, 1000);
+        }, 3000); // [TODO] TEMPORARY FIX, NEED TO FIND A BETTER WAY
     }, [svgXML]);
 
     // Dynamically update the size of the container
@@ -145,16 +145,16 @@ function SvgViewer({
                             if (!svgFitted) {
                                 // console.log(val);
                                 setValue(fitToViewer(val, "center", "center"));
-                                if (
-                                    svgDimensions.width > 0 &&
-                                    svgDimensions.height > 0 &&
-                                    (type === "motif" ||
-                                        val.SVGWidth === svgDimensions.width) &&
-                                    (type === "motif" ||
-                                        val.SVGHeight === svgDimensions.height)
-                                ) {
-                                    setSvgFitted(true);
-                                }
+                                // if (
+                                //     svgDimensions.width > 0 &&
+                                //     svgDimensions.height > 0 &&
+                                //     (type === "motif" ||
+                                //         val.SVGWidth === svgDimensions.width) &&
+                                //     (type === "motif" ||
+                                //         val.SVGHeight === svgDimensions.height)
+                                // ) {
+                                //     setSvgFitted(true);
+                                // }
                             } else {
                                 setValue(val);
                             }
