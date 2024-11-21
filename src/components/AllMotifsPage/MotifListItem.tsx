@@ -13,8 +13,9 @@ const MotifListItem: React.FC<MotifListItemProps> = ({ item, onViewClick }) => {
         .map(([family, count]) => `${family}(${count})`)
         .join(", ")}`;
 
+    const itemUrl = `${process.env.REACT_APP_BASENAME}/item/${item.id}`;
     return (
-        <div className="list-item">
+        <div className="list-item list-item-motif">
             <span className="id-column">{item.id}</span>
             <span className="families-column">{formattedFamilies}</span>
             <span className="occurrences-column">{item.numOccurences}</span>
@@ -22,9 +23,11 @@ const MotifListItem: React.FC<MotifListItemProps> = ({ item, onViewClick }) => {
             <span className="bpairs-column">{item.bpairs.length}</span>
             <span className="ipairs-column">{item.ipairs.length}</span>
             <span className="loops-column">{item.numLoops}</span>
-            <button className="expand-button" onClick={onViewClick}>
-                View Motif
-            </button>
+            <a href={itemUrl} target={"_blank"} rel={"noopener noreferrer"}>
+                <button className="expand-button" onClick={() => {}}>
+                    View Motif
+                </button>
+            </a>
         </div>
     );
 };

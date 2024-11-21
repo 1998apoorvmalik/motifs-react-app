@@ -17,6 +17,8 @@ import FindNewMotifsProgress from "./FindNewMotifsProgress";
 import ToggleSwitch from "../ToggleSwitch/ToggleSwitch";
 import Structure from "../../interfaces/Structure";
 import { structureService } from "../../services/structureService";
+import MotifListItem from "./MotifListItem";
+import StructureListItem from "./StructureListItem";
 
 const AllMotifsPage: React.FC = () => {
     const location = useLocation();
@@ -272,22 +274,6 @@ const AllMotifsPage: React.FC = () => {
             return (
                 <div className="grid-container">
                     {items.map((item, index) => (
-                        // itemType === "motifs" ? (
-                        //     <MotifItem
-                        //         key={index}
-                        //         item={item as Motif}
-                        //         onViewClick={() =>
-                        //             handleViewClick(item as Motif)
-                        //         }
-                        //     />
-                        // ) : (
-                        //     <StructureItem
-                        //         key={index}
-                        //         // index={(currentPage - 1) * itemsPerPage + index}
-                        //         item={item as Structure}
-                        //         onViewClick={() => {}}
-                        //     />
-                        // )
                         <MotifItem
                             key={index}
                             item={item as Motif}
@@ -299,17 +285,52 @@ const AllMotifsPage: React.FC = () => {
         } else {
             return (
                 <div>
-                    <div className="list-header">
-                        <span>Motif ID</span>
-                        <span>#Families</span>
-                        <span>#Occurrences</span>
-                        <span>Length</span>
-                        <span>#Boundary Pairs</span>
-                        <span>#Internal Pairs</span>
-                        <span>#Loops</span>
-                    </div>
+                    {itemType === "motifs" ? (
+                        <div className="list-header list-header-motif">
+                            <span>Motif ID</span>
+                            <span>#Families</span>
+                            <span>#Occurrences</span>
+                            <span>Length</span>
+                            <span>#Boundary Pairs</span>
+                            <span>#Internal Pairs</span>
+                            <span>#Loops</span>
+                        </div>
+                    ) : (
+                        <div className="list-header list-header-structure">
+                            <span>Structure ID</span>
+                            <span>Family</span>
+                            <span>Length</span>
+                            <span>#Pairs</span>
+                            <span>#Loops</span>
+                            <span>#Motifs</span>
+                        </div>
+                    )}
                     <div className="list-container">
-                        {/* Map items here when ready */}
+                        {items.map((item, index) => {
+                            const isMotif = itemType === "motifs";
+
+                            if (isMotif) {
+                                return (
+                                    <MotifListItem
+                                        key={index}
+                                        item={item as Motif}
+                                        onViewClick={() =>
+                                            handleViewClick(item as Motif)
+                                        }
+                                    />
+                                );
+                            } else {
+                                return (
+                                    <StructureListItem
+                                        key={index}
+                                        item={item as Structure}
+                                        onViewClick={() =>
+                                            handleViewClick(item as Structure)
+                                        }
+                                    />
+                                );
+                            }
+                        })}
                     </div>
                 </div>
             );
@@ -339,6 +360,24 @@ const AllMotifsPage: React.FC = () => {
                     https://github.com/shanry/RNA-Undesign/
                 </a>
             </p>
+
+            <div style={{ textAlign: "right", fontSize: "12px" }}>
+                <span>
+                    Web Server Created by{" "}
+                    <a
+                        href="https://apoorvmalik.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                            fontSize: "12px",
+                            textDecoration: "underline",
+                            // color: "007bff",
+                        }}
+                    >
+                        Apoorv Malik
+                    </a>
+                </span>
+            </div>
 
             <div className="border">
                 <div
