@@ -52,7 +52,7 @@ const RNAName: React.FC<RNANameProps> = ({ name, names, bigTitle }) => {
                 className="grid-item-title"
                 style={bigTitle ? { fontSize: "28px" } : {}}
             >
-                <div className="selected-name">{processName(names[0])}</div>
+                <div className="selected-name">{processName(name)}</div>
             </h2>
 
             {/* Expand/Collapse toggle */}
