@@ -74,14 +74,26 @@ app.get("/motifs/api/motifs", async (req: Request, res: Response) => {
 });
 
 
-app.get("/motifs/api/structure", async (req: Request, res: Response) => {
+app.get("/motifs/api/struc", async (req: Request, res: Response) => {
     try {
         console.log("[INFO] Fetching structure from the API");
-        const response = await axios.get(API_URL + "/api/structure", { params: req.query });
+        const response = await axios.get(API_URL + "/api/struc", { params: req.query });
         res.status(response.status).json(response.data);
     } catch (error) {
         const errorMessage = (error as any).message;
         console.error("Error fetching structure from the API:", errorMessage);
+        res.status(500).json({ error: "Failed to fetch structure from the API" });
+    }
+});
+
+app.get("/motifs/api/strucs", async (req: Request, res: Response) => {
+    try {
+        console.log("[INFO] Fetching structures from the API");
+        const response = await axios.get(API_URL + "/api/strucs", { params: req.query });
+        res.status(response.status).json(response.data);
+    } catch (error) {
+        const errorMessage = (error as any).message;
+        console.error("Error fetching structures from the API:", errorMessage);
         res.status(500).json({ error: "Failed to fetch structure from the API" });
     }
 });
