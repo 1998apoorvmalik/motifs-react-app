@@ -37,7 +37,7 @@ const AllMotifsPage: React.FC = () => {
         restoredItemsPageState.selectedFilters ||
         (itemType === "motifs"
             ? familyMapping.map((item) => item.value)
-            : ["eterna"]);
+            : ["eterna", "5s"]);
     const initialSelectedSort =
         restoredItemsPageState.selectedSort ||
         (itemType === "motifs" ? "Number of Families" : "Number of Motifs");
@@ -234,7 +234,7 @@ const AllMotifsPage: React.FC = () => {
         setItemType(newType);
         setSelectedFilters(
             itemType === "motifs"
-                ? ["eterna"]
+                ? ["eterna", "5s"]
                 : familyMapping.map((item) => item.value)
         );
         setSelectedSort(
