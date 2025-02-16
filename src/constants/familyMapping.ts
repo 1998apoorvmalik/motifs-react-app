@@ -10,7 +10,7 @@ export const familyMapping = [
     { display: "Group I", value: "grp1" },
     { display: "16S", value: "16s" },
     { display: "23S", value: "23s" },
-    { display: "User", value: "Other" },
+    { display: "User", value: "user" },
 ];
 
 // Map to retrieve display names by family value

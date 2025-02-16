@@ -90,7 +90,7 @@ const ExpandedItemView: React.FC = () => {
 
     useEffect(() => {
         const itemID = location.pathname.split("/").pop(); // Extract the item ID from the URL
-        const isMotif = !itemID?.includes("_"); // Determine if it's a motif or structure
+        const isMotif = !itemID?.includes("_") || itemID.startsWith("short"); // Determine if it's a motif or structure
 
         if (itemID) {
             const fetchItem = async () => {
