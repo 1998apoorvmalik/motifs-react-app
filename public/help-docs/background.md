@@ -10,7 +10,7 @@ Not all RNA secondary structures are computationally designable under the **Mini
 
 This is feasible because when a rival structure is similar to the target structure, the energy difference is often determined by a few critical nucleotides at sparse positions. The figure below illustrates an undesignable target structure from the Eterna100 benchmark, along with its corresponding (single) rival structure identified by the RIGENDE algorithm [1].
 
-![Target and Rival Structure](fiigs/rival_structure.png)
+![Target and Rival Structure](figs/rival_structure.png)
 
 ## Undesignable Motif
 
