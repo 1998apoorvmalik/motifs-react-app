@@ -7,6 +7,7 @@ import AllMotifsPage from "./components/AllMotifsPage/AllMotifsPage";
 import ExpandedItemView from "./components/ExpandedItemView/ExpandedItemView";
 import ExpandedStructureView from "./components/ExpandedStructureView";
 import NewMotifsPage from "./components/NewMotifsPage/NewMotifsPage";
+import HelpPage from "./components/HelpPage/HelpPage";
 
 const App: React.FC = () => {
     return (
@@ -14,6 +15,7 @@ const App: React.FC = () => {
             <Routes>
                 <Route path="/" element={<AllMotifsPage />} />
                 <Route path="/new" element={<NewMotifsPage />} />
+                <Route path="/help" element={<HelpPage />} />
                 <Route path="/item/:id" element={<ExpandedItemView />} />
                 <Route
                     path="/structure/:id"
