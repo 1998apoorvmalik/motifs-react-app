@@ -22,14 +22,28 @@
   text-decoration: underline;
 }
 
+.postHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2px;
+}
+
+.helpLink:hover {
+  text-decoration: underline;
+}
+
 .credit {
   text-align: right;
   font-size: 12px;
-  padding-bottom: 2px;
 }
 
 .creditLink {
-  font-size: 12px;
+  font-size: 1em;
+}
+
+.creditLink:hover {
   text-decoration: underline;
-  /* color: #007bff; Uncomment to apply link color */
 }

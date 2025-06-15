@@ -316,7 +316,7 @@ const AllMotifsPage: React.FC = () => {
         <div className={styles.papers} style={{ marginTop: '6px' }}>
           Papers:
           <a
-            href="https://recomb2025.org/your-paper-link"
+            href="https://link.springer.com/chapter/10.1007/978-1-0716-3989-4_17"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.paperLink}
@@ -325,7 +325,7 @@ const AllMotifsPage: React.FC = () => {
           </a>
           &
           <a
-            href="https://recomb2024.org/your-paper-link"
+            href="https://link.springer.com/chapter/10.1007/978-3-031-90252-9_10"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.paperLink}
@@ -335,8 +335,21 @@ const AllMotifsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className={styles.credit}>
-        <span>
+      <div className={styles.postHeaderRow}>
+        <div>
+          See{' '}
+          <a
+            href={`${process.env.REACT_APP_BASENAME}/help`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.helpLink}
+          >
+            Help & Documentation
+          </a>{' '}
+          to learn how to use the server and interpret results.
+        </div>
+
+        <div className={styles.credit}>
           Web Server Created by{' '}
           <a
             href="https://apoorvmalik.com"
@@ -346,7 +359,7 @@ const AllMotifsPage: React.FC = () => {
           >
             Apoorv Malik
           </a>
-        </span>
+        </div>
       </div>
 
       <div className="border">
