@@ -31,6 +31,10 @@
   margin-bottom: 2px;
 }
 
+.helpLink {
+  font-size: 1em;
+}
+
 .helpLink:hover {
   text-decoration: underline;
 }

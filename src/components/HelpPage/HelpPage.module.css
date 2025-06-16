@@ -117,6 +117,13 @@
   min-width: 0;
 }
 
+.content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem auto;
+}
+
 .docSection {
   margin-bottom: 2rem;
   border: 1px solid var(--border-color);
