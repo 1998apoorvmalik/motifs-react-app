@@ -30,7 +30,7 @@ Not all RNA secondary structures are computationally designable under the **uniq
 
 While exhaustively enumerating all possible sequences to prove y is undesignable is infeasible, one practical approach is to identify one or more <em>rival structures</em> that are energetically favored over y across all possible sequences ($x_1$ and $x_2$).
 
-This is feasible because when a rival structure is similar to the target structure, the energy difference is often determined by a few critical nucleotides at sparse positions. The figure below illustrates an undesignable target structure from the Eterna100 benchmark, along with its corresponding (single) rival structure identified by the RIGENDE algorithm [1].
+This is feasible because when a rival structure is similar to the target structure, the energy difference is often determined by a few critical nucleotides at sparse positions. The figure below illustrates an undesignable target structure from the Eterna100 benchmark, along with its corresponding (single) rival structure identified by the RIGENDE algorithm.
 
 ![Target and Rival Structure](/motifserver/help-docs/figs/rival_structure.png)
 
@@ -38,6 +38,6 @@ This is feasible because when a rival structure is similar to the target structu
 
 While rival structures can provide evidence of undesignability at the whole-structure level, they offer limited interpretability. In practice, undesignability often originates from specific local regions or structural motifs. Identifying the smallest such regions—called <em>minimal undesignable motifs</em>—can provide insight into why a structure resists design. This interpretability enhances both understanding and potential reuse in RNA design workflows.
 
-The figure below shows an example from Eterna100 with three highlighted minimal undesignable motifs, identified by the FastMotif algorithm [1].
+The figure below shows an example from Eterna100 with three highlighted minimal undesignable motifs, identified by the FastMotif algorithm.
 
 ![Minimal Undesignable Motifs](/motifserver/help-docs/figs/minimal_motifs.png)
