@@ -1,12 +1,20 @@
 # Background
 
-RNA design aims to find RNA sequences (`x`) that fold into a target secondary structure (`y`) under a specific RNA folding model, as illustrated in the figure below. For the widely adopted Turner RNA folding model, RNA folding can be computed in cubic time via dynamic programming. However, the search space of sequences is exponentially large. As a result, the RNA design problem is considered NP-hard.
+RNA design aims to find RNA sequences ($x$) that fold into a target secondary structure ($y$) under a specific RNA folding model, as illustrated in the figure below. For the widely adopted Turner RNA folding model, RNA folding can be computed in cubic time via dynamic programming. However, the search space of sequences is exponentially large. As a result, the RNA design problem is considered NP-hard.
 
 ![Inverse Illustration](figs/inverse.png)
 
-## Undesignable Structure
+## Designable and Undesignable Structure
 
-Not all RNA secondary structures are computationally designable under the **Minimum Free Energy (MFE)** criterion—that is, for some structures y, no RNA sequence x will fold into y as its MFE structure. While exhaustively enumerating all possible sequences to prove y is undesignable is infeasible, one practical approach is to identify one or more <em>rival structures</em> that are energetically favored over y across all possible sequences.
+A secondary structure is designable if there exists an RNA sequence $x$ such that the target structure $y$ is the unique minimum free energy (uMFE) structure of $x$. Visually, this corresponds to $y^\star$ being the global minimum in the energy landscape of $x$, as illustrated in the figure below.
+
+![Designable Landscape](figs/designable_landscape.png)
+
+Not all RNA secondary structures are computationally designable under the **unique Minimum Free Energy (uMFE)** criterion—that is, for some structures $y$, no RNA sequence $x$ will fold into $y$ as its unique MFE structure. In other words, for every candidate sequence $x$, there is always an alternative structure $y'_x$ with free energy equal to or lower than that of $y^\star$. As illustrated in the figure below, $y^\star$ fails to be the global minimum in the energy landscapes of all possible sequences.
+
+![Undesignable Landscape](figs/undesignable_landscape.png)
+
+While exhaustively enumerating all possible sequences to prove y is undesignable is infeasible, one practical approach is to identify one or more <em>rival structures</em> that are energetically favored over y across all possible sequences ($x_1$ and $x_2$).
 
 This is feasible because when a rival structure is similar to the target structure, the energy difference is often determined by a few critical nucleotides at sparse positions. The figure below illustrates an undesignable target structure from the Eterna100 benchmark, along with its corresponding (single) rival structure identified by the RIGENDE algorithm [1].
 
