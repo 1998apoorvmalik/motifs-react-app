@@ -470,6 +470,24 @@ const AllMotifsPage: React.FC = () => {
             </div>
           </div>
           {renderItems()}
+          <div className="header-bar">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+            <div className="centered-container">
+              <div
+                className="center"
+                style={{
+                  marginLeft: '8px',
+                  marginRight: '16px',
+                }}
+              >
+                <ItemsPerPage itemsPerPage={itemsPerPage} onItemsPerPageChange={setItemsPerPage} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
