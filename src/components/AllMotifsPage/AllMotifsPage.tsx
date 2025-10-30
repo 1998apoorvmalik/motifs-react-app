@@ -155,6 +155,7 @@ const AllMotifsPage: React.FC = () => {
       navigate('/new', {
         state: {
           motifs: response?.motifs,
+          structure: inputStructure,
         },
       });
     } else {
