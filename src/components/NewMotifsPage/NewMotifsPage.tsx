@@ -6,9 +6,10 @@ import GridItem from '../GridItem';
 import Pagination from '../Pagination';
 import ItemsPerPage from '../ItemsPerPage';
 import MotifFilterDropdown from './MotifFilterDropdown';
+import { motifService } from '../../services/motifService';
 
-const NAME_MAX = 80;     // reasonable UX cap
-const EMAIL_MAX = 254;   // RFC max length for email
+const NAME_MAX = 80; // reasonable UX cap
+const EMAIL_MAX = 254; // RFC max length for email
 
 // Allow letters (incl. accents), marks, spaces, apostrophes, hyphens, periods
 // Use a Latin Unicode range to cover common accented characters and remove the `u` flag
@@ -19,8 +20,8 @@ const EMAIL_PATTERN = '^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$'; // basic browser chec
 function sanitizeName(input: string) {
   return input
     .normalize('NFKC')
-    .replace(NAME_ALLOWED_RE, '')     // strip illegal chars
-    .replace(/\s+/g, ' ')             // collapse spaces
+    .replace(NAME_ALLOWED_RE, '') // strip illegal chars
+    .replace(/\s+/g, ' ') // collapse spaces
     .trim()
     .slice(0, NAME_MAX);
 }
@@ -105,6 +106,7 @@ const NewMotifsPage: React.FC = () => {
   const [discovererEmail, setDiscovererEmail] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveStructure, setSaveStructure] = useState(true);
 
   // Show the consent panel once when there are any new motifs
   useEffect(() => {
@@ -118,50 +120,55 @@ const NewMotifsPage: React.FC = () => {
     }
   }, [newMotifs.length]);
 
-  // Placeholder saver: replace with your real API/services when ready
-  async function saveAllNewMotifsPlaceholder(args: {
+  async function saveAllNewMotifs(args: {
     motifs: Motif[];
-    structure: Structure;
+    structure?: Structure;
     discovererName?: string;
     discovererEmail?: string;
+    saveStructure?: boolean;
   }) {
-    if (!args.structure) throw new Error('Input structure is required.');
-    // Simulate save structure once
-    await new Promise(r => setTimeout(r, 3000));
-    console.log('Saving structure (placeholder):', args.structure);
-    for (const m of args.motifs) {
-      console.log('Saving motif (placeholder):', {
-        motif: m,
-        discovererName: args.discovererName,
-        discovererEmail: args.discovererEmail,
-      });
+    if (args.saveStructure && !args.structure) {
+      throw new Error('Structure is required when saving together with motifs.');
+    }
+    const result = await motifService.submitMotifsAndStructureForReview({
+      motifs: args.motifs,
+      structure: args.structure,
+      discovererName: args.discovererName,
+      discovererEmail: args.discovererEmail,
+      saveStructure: args.saveStructure,
+    });
+    if (!result.ok) {
+      throw new Error(result.message);
     }
   }
 
-  const handleConsentNo = () => {
-    setShowConsent(false);
-  };
-
+  // --- update this function’s error message and keep the rest the same ---
   const handleConsentYes = async () => {
-    if (!structure) {
-      setSaveError('Cannot save: input structure was not provided.');
+    // only block if user wants to save structure but it's missing
+    if (saveStructure && !structure) {
+      setSaveError('Structure is required to include with your submission.');
       return;
     }
     try {
       setSaving(true);
       setSaveError(null);
-      await saveAllNewMotifsPlaceholder({
+      await saveAllNewMotifs({
         motifs: newMotifs,
-        structure,
+        structure: structure ?? undefined, // may be undefined if saveStructure is false
         discovererName: discovererName.trim() || undefined,
         discovererEmail: discovererEmail.trim() || undefined,
+        saveStructure,
       });
       setShowConsent(false);
     } catch (e: any) {
-      setSaveError(e?.message || 'Failed to save new motifs.');
+      setSaveError(e?.message || 'Failed to submit items for admin review.');
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleConsentNo = () => {
+    setShowConsent(false);
   };
 
   if (redirecting) {
@@ -200,16 +207,22 @@ const NewMotifsPage: React.FC = () => {
               display: 'flex',
               alignItems: 'center',
               gap: 8,
-              marginBottom: 12,
+              marginBottom: !saveError ? 12 : 0,
               flexWrap: 'wrap',
             }}
           >
-            {!saving && (
+            {!saving && !saveError && (
               <>
                 <strong>
-                  {newMotifs.length} new {newMotifs.length === 1 ? 'motif' : 'motifs'} found
+                  {newMotifs.length} New {newMotifs.length === 1 ? 'Motif' : 'Motifs'} Found
                 </strong>
-                <span>— Save all to database?</span>
+                <span>
+                  Save motifs to the database? Selecting <b>Yes</b> will add {newMotifs.length}{' '}
+                  {newMotifs.length === 1 ? 'motif' : 'motifs'} to the collective repository of
+                  undesignable RNA motifs, contributing to the growing community database for future
+                  research and reference. Your name (optional) will appear in the Motif ID, and your
+                  email will remain private.
+                </span>
               </>
             )}
             {saving && (
@@ -220,53 +233,80 @@ const NewMotifsPage: React.FC = () => {
             )}
           </div>
 
-          {/* Full-width inputs using your default input styles */}
-          <div style={{ display: 'grid', gap: 8 }}>
-            <input
-              placeholder="Your (Discoverer) Name (Optional)"
-              value={discovererName}
-              onChange={e => setDiscovererName(sanitizeName(e.target.value))}
-              onPaste={e => {
-                e.preventDefault();
-                const text = e.clipboardData.getData('text') || '';
-                setDiscovererName(sanitizeName(text));
-              }}
-              maxLength={NAME_MAX}
-              disabled={saving}
-              style={{ width: '100%' }}
-              autoComplete="name"
-              inputMode="text"
-            />
-            <input
-              type="email"
-              placeholder="Your (Discoverer) Email (Optional)"
-              value={discovererEmail}
-              onChange={e => setDiscovererEmail(sanitizeEmail(e.target.value))}
-              onPaste={e => {
-                e.preventDefault();
-                const text = e.clipboardData.getData('text') || '';
-                setDiscovererEmail(sanitizeEmail(text));
-              }}
-              maxLength={EMAIL_MAX}
-              pattern={EMAIL_PATTERN} // browser will mark invalid if non-empty & not matching
-              title="Enter a valid email like user@example.com"
-              disabled={saving}
-              style={{ width: '100%' }}
-              autoComplete="email"
-              inputMode="email"
-            />
-          </div>
-          {!saving && (
-            <div style={{ display: 'flex', gap: 0, justifyContent: 'flex-end', marginTop: 12 }}>
-              <button onClick={handleConsentNo} className="reset-button" disabled={saving}>
-                No
-              </button>
-              <button onClick={handleConsentYes} className="apply-button" disabled={saving}>
-                {saving ? 'Saving…' : 'Yes'}
-              </button>
+          {!saveError && (
+            <div style={{ display: 'grid', gap: 8 }}>
+              <input
+                placeholder="Your (Discoverer) Name (Optional)"
+                value={discovererName}
+                onChange={e => setDiscovererName(sanitizeName(e.target.value))}
+                onPaste={e => {
+                  e.preventDefault();
+                  const text = e.clipboardData.getData('text') || '';
+                  setDiscovererName(sanitizeName(text));
+                }}
+                maxLength={NAME_MAX}
+                disabled={saving}
+                style={{ width: '100%' }}
+                autoComplete="name"
+                inputMode="text"
+              />
+              <input
+                type="email"
+                placeholder="Your (Discoverer) Email (Optional)"
+                value={discovererEmail}
+                onChange={e => setDiscovererEmail(sanitizeEmail(e.target.value))}
+                onPaste={e => {
+                  e.preventDefault();
+                  const text = e.clipboardData.getData('text') || '';
+                  setDiscovererEmail(sanitizeEmail(text));
+                }}
+                maxLength={EMAIL_MAX}
+                pattern={EMAIL_PATTERN} // browser will mark invalid if non-empty & not matching
+                title="Enter a valid email like user@example.com"
+                disabled={saving}
+                style={{ width: '100%' }}
+                autoComplete="email"
+                inputMode="email"
+              />
             </div>
           )}
-          {saveError ? <div style={{ color: '#b00020', marginTop: 8 }}>{saveError}</div> : null}
+          {!saving && !saveError && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginTop: 12,
+                flexWrap: 'wrap',
+                gap: 8,
+              }}
+            >
+              {/* Left: checkbox */}
+              <label style={{ display: 'flex', gap: 6 }}>
+                <input
+                  type="checkbox"
+                  checked={saveStructure}
+                  onChange={e => setSaveStructure(e.target.checked)}
+                  disabled={saving}
+                />
+                <span>
+                  Save Input RNA Structure (links {motifs.length > 1 ? 'Motifs' : 'Motif'} and RNA
+                  Structure)
+                </span>
+              </label>
+
+              {/* Right: buttons */}
+              <div style={{ display: 'flex' }}>
+                <button onClick={handleConsentNo} className="reset-button" disabled={saving}>
+                  No
+                </button>
+                <button onClick={handleConsentYes} className="apply-button" disabled={saving}>
+                  {saving ? 'Saving…' : 'Yes'}
+                </button>
+              </div>
+            </div>
+          )}
+          {saveError ? <div style={{ color: '#b00020', margin: 'none' }}>{saveError}</div> : null}
         </div>
       )}
 
@@ -298,9 +338,9 @@ const NewMotifsPage: React.FC = () => {
 
         <div
           className="grid-container"
-          //   style={{
-          //     gridTemplateColumns: "repeat(auto-fill, minmax(50%, 2fr))",
-          //   }}
+          style={{
+            gridTemplateColumns: 'repeat(auto-fill, minmax(50%, 2fr))',
+          }}
         >
           {currentMotifs.map((item, index) => (
             <GridItem
