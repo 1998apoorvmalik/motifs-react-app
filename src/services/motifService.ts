@@ -105,7 +105,7 @@ export const motifService = {
       jsonData.motifs.forEach((motifData: any, index: number) => {
         try {
           const newMotif = motifFromJson(motifData);
-          newMotif.id = (motifData.id_uniq > 361 ? 'New' : motifData.id_uniq) || motifData.id;
+          newMotif.id = newMotif.new ? 'New' : motifData.id_uniq;
           newMotif.svg = jsonData.svgs[index]?.content || '';
           motifs.push(newMotif);
         } catch (error) {

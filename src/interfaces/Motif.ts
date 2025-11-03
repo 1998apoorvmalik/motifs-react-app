@@ -4,6 +4,8 @@ import { familyDisplayMap } from "../constants/familyMapping";
 export default interface Motif {
     type: "motif";
     id: string;
+    motif: Object;
+    new: boolean;
     numOccurences: number;
     length: number;
     families: { [familyName: string]: number };
@@ -27,6 +29,8 @@ export function motifFromJson(data: any): Motif {
     return {
         type: "motif",
         id: data._id || "unknown",
+        motif: data.motif || {},
+        new: !data.is_duplicated || false,
         numOccurences: data.occurrences?.length || 0,
         length: data.length || 0,
         families, // Mapped family names with correct typing

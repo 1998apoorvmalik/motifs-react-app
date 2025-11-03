@@ -10,6 +10,7 @@ import CopyableTextBlock from '../CopyableTextBlock';
 import { motifService } from '../../services/motifService'; // Import the service to fetch motifs
 import { structureService } from '../../services/structureService';
 import RNAName from '../RNAName';
+import { familyMapping } from '../../constants/familyMapping';
 
 function processStructureIDs(structureIDs: string[]): Record<string, string[]> {
   return structureIDs.reduce<Record<string, string[]>>((acc, id) => {
@@ -81,10 +82,7 @@ const ExpandedItemView: React.FC = () => {
 
   useEffect(() => {
     const itemID = location.pathname.split('/').pop(); // Extract the item ID from the URL
-    const isMotif =
-      !itemID?.includes('_') ||
-      itemID.startsWith('short') ||
-      itemID.match(/^[a-z0-9_]+_\d{10,}_\d+$/); // Determine if it's a motif or structure
+    const isMotif = !familyMapping.some(fam => itemID?.toLowerCase().includes(fam.value.toLowerCase()));
 
     if (itemID) {
       const fetchItem = async () => {
