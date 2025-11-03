@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
 import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import rehypeKatex from 'rehype-katex';
+import rehypeRaw from 'rehype-raw';
+import 'katex/dist/katex.min.css';
 import styles from './HelpPage.module.css';
 
 const base = process.env.PUBLIC_URL || '';
@@ -10,9 +14,21 @@ const base = process.env.PUBLIC_URL || '';
 const files = [
   { id: 'overview', title: 'Overview', path: `${base}/help-docs/overview.md` },
   { id: 'motif-view', title: 'Motif View Page', path: `${base}/help-docs/motif-view.md` },
-  { id: 'structure-view', title: 'Structure View Page', path: `${base}/help-docs/structure-view.md` },
-  { id: 'input-structure', title: 'Input New Structure', path: `${base}/help-docs/input-structure.md` },
-  { id: 'contact-and-papers', title: 'Contact & Papers', path: `${base}/help-docs/contact-and-papers.md` },
+  {
+    id: 'structure-view',
+    title: 'Structure View Page',
+    path: `${base}/help-docs/structure-view.md`,
+  },
+  {
+    id: 'input-structure',
+    title: 'Input New Structure',
+    path: `${base}/help-docs/input-structure.md`,
+  },
+  {
+    id: 'contact-and-papers',
+    title: 'Contact & Papers',
+    path: `${base}/help-docs/contact-and-papers.md`,
+  },
 ];
 
 const HelpPage: React.FC = () => {
@@ -102,16 +118,15 @@ const HelpPage: React.FC = () => {
             <section key={file.id} id={file.id} className={styles.docSection}>
               <div className={styles.sectionHeader} onClick={() => toggleSection(file.id)}>
                 <span>{file.title}</span>
-                <span className={styles.toggleIcon}>
-                  {expanded[file.id] ? '−' : '+'}
-                </span>
+                <span className={styles.toggleIcon}>{expanded[file.id] ? '-' : '+'}</span>
               </div>
               {expanded[file.id] && (
                 <div className={styles.markdownContent}>
                   <ReactMarkdown
                     children={sections[file.id] || ''}
-                    remarkPlugins={[remarkGfm]}
-                    rehypePlugins={[rehypeSlug, rehypeAutolinkHeadings]}
+                    remarkPlugins={[[remarkMath, { singleDollarTextMath: true }], remarkGfm]}
+                    rehypePlugins={[rehypeRaw, rehypeKatex, rehypeSlug, rehypeAutolinkHeadings]}
+                    // skipHtml={false}
                   />
                 </div>
               )}
