@@ -227,8 +227,7 @@ const NewMotifsPage: React.FC = () => {
             )}
             {saving && (
               <strong>
-                Saving {newMotifs.length} new {newMotifs.length === 1 ? 'motif' : 'motifs'} to the
-                database...
+                Saving {newMotifs.length} new {newMotifs.length === 1 ? 'motif' : 'motifs'} for review...
               </strong>
             )}
           </div>
