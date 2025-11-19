@@ -106,6 +106,7 @@ const NewMotifsPage: React.FC = () => {
   const [discovererEmail, setDiscovererEmail] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [saveStructure, setSaveStructure] = useState(true);
 
   // Show the consent panel once when there are any new motifs
@@ -159,6 +160,9 @@ const NewMotifsPage: React.FC = () => {
         discovererEmail: discovererEmail.trim() || undefined,
         saveStructure,
       });
+      setSaveMessage(
+        'Your motif submission has been received for review, expect up to 24 hours for the database to update.'
+      );
       setShowConsent(false);
     } catch (e: any) {
       setSaveError(e?.message || 'Failed to submit items for admin review.');
@@ -308,6 +312,22 @@ const NewMotifsPage: React.FC = () => {
           {saveError ? <div style={{ color: '#b00020', margin: 'none' }}>{saveError}</div> : null}
         </div>
       )}
+
+      {saveMessage ? (
+        <div
+          style={{
+            margin: '12px auto 20px',
+            width: 'min(960px, 50vw)',
+            background: '#f0fdf4',
+            border: '1px solid #bbf7d0',
+            borderRadius: 8,
+            padding: 12,
+            color: '#166534',
+          }}
+        >
+          {saveMessage}
+        </div>
+      ) : null}
 
       <div className="container">
         <div className="header-bar">
